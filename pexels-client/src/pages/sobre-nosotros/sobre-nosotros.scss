@@ -1,0 +1,39 @@
+.about-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+
+  &__content {
+    max-width: 800px;
+    text-align: center;
+  }
+
+  &__title {
+    font-size: 3rem;
+    color: white;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff5722, #ff7043);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__subtitle {
+    font-size: 1.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 2rem;
+  }
+
+  &__description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.125rem;
+    line-height: 1.8;
+
+    p {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
