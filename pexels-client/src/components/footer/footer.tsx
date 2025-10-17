@@ -6,12 +6,13 @@ import "./footer.scss";
  * Pie de página de la aplicación con enlaces secundarios y redes sociales.
  * 
  * @component
- * @returns {JSX.Element} Footer con navegación secundaria
+ * @returns {JSX.Element} Footer con navegación secundaria y logo
  */
 const Footer: React.FC = () => {
   return (
     <footer className="footer">
       <div className="footer__container">
+        {/* Sección Mapa del Sitio */}
         <div className="footer__section">
           <h3 className="footer__title">Mapa del sitio</h3>
           <div className="footer__links">
@@ -22,6 +23,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
+        {/* Sección Menú */}
         <div className="footer__section">
           <h3 className="footer__title">Menú</h3>
           <div className="footer__links">
@@ -34,6 +36,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
+        {/* Sección Síguenos */}
         <div className="footer__section">
           <h3 className="footer__title">Síguenos</h3>
           <div className="footer__social">
@@ -64,10 +67,12 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
+        {/* Sección Logo - AirFilms */}
         <div className="footer__section footer__section--logo">
           <div className="footer__logo">
             <span className="footer__logo-text">AirFilms</span>
           </div>
+          <img src="/public/airfilms.png" alt="Logo de AirFilms" className="footer__logo-image" />
         </div>
       </div>
 

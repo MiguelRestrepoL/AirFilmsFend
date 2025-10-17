@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar__container">
         <Link to="/" className="navbar__logo" onClick={() => setMenuAbierto(false)}>
-          <img src="/AirFilms.png" alt="AirFilms" />
+          <span className="navbar__logo-text">AirFilms</span>
         </Link>
         
         {/* Links Desktop */}
@@ -43,15 +43,18 @@ const Navbar: React.FC = () => {
 
         {/* Botones Desktop */}
         <div className="navbar__actions">
-          <button className="navbar__button navbar__button--secondary">
+          <button 
+            className="navbar__button navbar__button--secondary"
+            onClick={() => window.location.href = '/sobre-nosotros#contacto'}
+          >
             Contacto
           </button>
-          <button className="navbar__button navbar__button--primary">
+          <Link to="/inicio-sesion" className="navbar__button navbar__button--primary">
             Iniciar Sesión
-          </button>
-          <button className="navbar__button navbar__button--accent">
+          </Link>
+          <Link to="/registrarse" className="navbar__button navbar__button--accent">
             Registrarse
-          </button>
+          </Link>
         </div>
 
         {/* Botón hamburguesa móvil */}
