@@ -1,24 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
-import "./navbar.scss";
+import "./Navbar.scss";
 
 /**
  * Barra de navegación global con enlaces a las rutas principales.
+ * Incluye menú hamburguesa para dispositivos móviles.
  * 
  * @component
  * @returns {JSX.Element} Elemento de navegación semántico con enlaces
- * 
- * @accessibility
- * Usa <nav> semántico y <Link> para navegación con teclado y lectores de pantalla.
+ * @remarks
+ * - Enlaces a Inicio, Películas, Sobre Nosotros
+ * - Botones para Contacto, Iniciar Sesión, Registrarse
+ * - Menú responsive que se adapta a pantallas pequeñas
  */
+
 const Navbar: React.FC = () => {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuAbierto(!menuAbierto);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar__container">
-        <Link to="/" className="navbar__logo">
-          <span className="navbar__logo-text">AirFilms</span>
+        <Link to="/" className="navbar__logo" onClick={() => setMenuAbierto(false)}>
+          <img src="/AirFilms.png" alt="AirFilms" />
         </Link>
         
+        {/* Links Desktop */}
         <div className="navbar__links">
           <Link to="/" className="navbar__link">
             Inicio
@@ -31,6 +41,7 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
 
+        {/* Botones Desktop */}
         <div className="navbar__actions">
           <button className="navbar__button navbar__button--secondary">
             Contacto
@@ -42,7 +53,52 @@ const Navbar: React.FC = () => {
             Registrarse
           </button>
         </div>
+
+        {/* Botón hamburguesa móvil */}
+        <button
+          className="navbar__menu-toggle"
+          onClick={toggleMenu}
+          aria-label="Abrir menú de navegación"
+          aria-expanded={menuAbierto}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            {menuAbierto ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Menú móvil */}
+      {menuAbierto && (
+        <div className="navbar__menu-movil">
+          <div className="navbar__links-movil">
+            <Link to="/" className="navbar__link-movil" onClick={toggleMenu}>
+              Inicio
+            </Link>
+            <Link to="/peliculas" className="navbar__link-movil" onClick={toggleMenu}>
+              Películas
+            </Link>
+            <Link to="/sobre-nosotros" className="navbar__link-movil" onClick={toggleMenu}>
+              Sobre Nosotros
+            </Link>
+          </div>
+
+          <div className="navbar__actions-movil">
+            <button className="navbar__button navbar__button--secondary" onClick={toggleMenu}>
+              Contacto
+            </button>
+            <button className="navbar__button navbar__button--primary" onClick={toggleMenu}>
+              Iniciar Sesión
+            </button>
+            <button className="navbar__button navbar__button--accent" onClick={toggleMenu}>
+              Registrarse
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
