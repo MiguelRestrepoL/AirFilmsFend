@@ -168,13 +168,15 @@ const Registro: React.FC = () => {
             <div className="registro__circle registro__circle--3"></div>
           </div>
           
-          <div className="registro__logo-container">
-            <img 
-              src="/AirFilms.png" 
-              alt="AirFilms Logo" 
-              className="registro__logo-img"
-            />
-          </div>
+            <div className="registro__logo-container">
+           <Link to="/">
+             <img 
+               src="/AirFilms.png" 
+               alt="AirFilms Logo" 
+               className="registro__logo-img"
+             />
+           </Link>
+           </div>
           
           <div className="registro__welcome">
             <h2 className="registro__welcome-title">Abraza el entretenimiento</h2>

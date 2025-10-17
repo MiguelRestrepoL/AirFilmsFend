@@ -74,11 +74,13 @@ const InicioSesion: React.FC = () => {
         {/* Lado Izquierdo - Branding */}
         <div className="inicio-sesion__branding">
           <div className="inicio-sesion__logo-container">
+            <Link to="/">
             <img 
               src="/AirFilms.png" 
               alt="AirFilms Logo" 
               className="inicio-sesion__logo-img"
             />
+            </Link>
           </div>
           <p className="inicio-sesion__branding-text">
             Vinimos a controlar el entretenimiento. <br />
