@@ -1,0 +1,116 @@
+.navbar {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.95),
+    rgba(10, 10, 10, 0.8)
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 87, 34, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  &__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  &__logo {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+
+  &__logo-text {
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff5722, #ff7043);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__links {
+    display: flex;
+    gap: 2rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  &__link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #ff5722;
+      transition: width 0.3s ease;
+    }
+
+    &:hover {
+      color: #ff5722;
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  &__button {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &--secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+
+      &:hover {
+        border-color: #ff5722;
+        color: #ff5722;
+      }
+    }
+
+    &--primary {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    &--accent {
+      background: linear-gradient(135deg, #ff5722, #ff7043);
+      color: white;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+      }
+    }
+  }
+}

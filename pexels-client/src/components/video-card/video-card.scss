@@ -1,0 +1,64 @@
+.video-card {
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1a1a;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(255, 87, 34, 0.3);
+
+    .video-card__overlay {
+      opacity: 1;
+    }
+  }
+
+  &__image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 140%; // Aspect ratio para póster
+    overflow: hidden;
+    background: #2a2a2a;
+  }
+
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &__play-icon {
+    width: 60px;
+    height: 60px;
+    color: #ff5722;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+
+  &__info {
+    padding: 1rem;
+  }
+
+  &__id {
+    color: #999;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}

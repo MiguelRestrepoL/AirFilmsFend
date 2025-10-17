@@ -1,0 +1,45 @@
+.home-page {
+  min-height: 100vh;
+
+  &__content {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  &__subtitle {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+
+  &__description {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  &__cta {
+    background: linear-gradient(135deg, #ff5722, #ff7043);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
