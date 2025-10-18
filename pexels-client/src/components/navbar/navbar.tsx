@@ -280,7 +280,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="navbar__actions">
-          <Link to="/login" className="navbar__button navbar__button--primary">
+          <Link to="/inicio-sesion" className="navbar__button navbar__button--primary">
             Iniciar Sesión
           </Link>
           <Link to="/registro" className="navbar__button navbar__button--accent">
@@ -307,7 +307,7 @@ const Navbar: React.FC = () => {
             <Link to="/sobre-nosotros" className="navbar__link-movil" onClick={toggleMenu}>Sobre Nosotros</Link>
           </div>
           <div className="navbar__actions-movil">
-            <Link to="/login" className="navbar__button navbar__button--primary" onClick={toggleMenu}>
+            <Link to="/inicio-sesion" className="navbar__button navbar__button--primary" onClick={toggleMenu}>
               Iniciar Sesión
             </Link>
             <Link to="/registro" className="navbar__button navbar__button--accent" onClick={toggleMenu}>
