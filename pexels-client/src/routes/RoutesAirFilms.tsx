@@ -37,14 +37,8 @@ const RoutesAirFilms: React.FC = () => {
         <Route path="/site-map" element={<LayoutAirFilms><SiteMapPage /></LayoutAirFilms>} />
 
         {/* Rutas Protegidas */}
-        <Route 
-          path="/perfil" 
-          element={<RutaProtegida><LayoutAirFilms><Perfil /></LayoutAirFilms></RutaProtegida>} 
-        />
-        <Route 
-          path="/eliminar-perfil" 
-          element={<RutaProtegida><LayoutAirFilms><EliminarPerfil /></LayoutAirFilms></RutaProtegida>} 
-        />
+        <Route path="/perfil" element={ <LayoutAirFilms><Perfil /></LayoutAirFilms>} />
+        <Route path="/eliminar-perfil" element={ <LayoutAirFilms><EliminarPerfil /></LayoutAirFilms>} />
 
         {/* Auth (sin Layout) */}
         <Route path="/inicio-sesion" element={<InicioSesion />} />
