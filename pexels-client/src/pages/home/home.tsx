@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ResultadoBusquedaVideo } from "../../types/video.types";
@@ -31,24 +32,53 @@ const HomePage: React.FC = () => {
         if (token) {
           // Verificar token con el backend
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
-          const response = await fetch(`${apiUrl}/user/profile`, {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
-          });
+          
+          try {
+            const response = await fetch(`${apiUrl}/auth/verify-auth`, {
+              headers: {
+                "Authorization": `Bearer ${token}`
+              }
+            });
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.user) {
-              setUsuario(data.user);
-              setEstaAutenticado(true);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success) {
+                // Token válido, ahora obtenemos el perfil
+                const profileResponse = await fetch(`${apiUrl}/user/profile`, {
+                  headers: {
+                    "Authorization": `Bearer ${token}`
+                  }
+                });
+
+                if (profileResponse.ok) {
+                  const profileData = await profileResponse.json();
+                  if (profileData.success && profileData.user) {
+                    setUsuario(profileData.user);
+                    setEstaAutenticado(true);
+                  } else {
+                    // Si no hay perfil pero el token es válido, igual autenticamos
+                    setEstaAutenticado(true);
+                    setUsuario({ name: "Usuario" });
+                  }
+                } else {
+                  setEstaAutenticado(false);
+                  localStorage.removeItem("authToken");
+                }
+              } else {
+                setEstaAutenticado(false);
+                localStorage.removeItem("authToken");
+              }
             } else {
-              localStorage.removeItem("authToken");
               setEstaAutenticado(false);
+              localStorage.removeItem("authToken");
             }
-          } else {
-            localStorage.removeItem("authToken");
-            setEstaAutenticado(false);
+          } catch (err) {
+            console.error("Error al verificar token:", err);
+            // Si hay error de red pero tenemos token, asumimos autenticado temporalmente
+            if (token) {
+              setEstaAutenticado(true);
+              setUsuario({ name: "Usuario" });
+            }
           }
         } else {
           setEstaAutenticado(false);

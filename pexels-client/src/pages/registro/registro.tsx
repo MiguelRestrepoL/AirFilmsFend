@@ -122,7 +122,7 @@ const Registro: React.FC = () => {
         throw new Error(data.message || "Error al registrarse");
       }
 
-      navigate("/login", { 
+      navigate("/inicio-sesion", { 
         state: { message: "¡Registro exitoso! Ya puedes iniciar sesión." }
       });
     } catch (err: any) {
