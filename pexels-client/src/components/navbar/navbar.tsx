@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
-import "./Navbar.scss";
+import "./navbar.scss";
 
 /**
  * Barra de navegación global con enlaces a las rutas principales.
