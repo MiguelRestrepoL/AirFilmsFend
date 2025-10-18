@@ -1,4 +1,4 @@
-/** Imports de la aplicación AirFilms */
+/** sImports de la aplicación AirFilms */
 
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
