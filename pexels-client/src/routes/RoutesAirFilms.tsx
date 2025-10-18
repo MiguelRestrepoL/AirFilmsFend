@@ -7,6 +7,8 @@ import AboutPage from "../pages/sobre-nosotros/sobre-nosotros";
 import SiteMapPage from "../pages/site-map/site-map";
 import InicioSesion from "../pages/inicioSesion/inicioSesion";
 import Registro from "../pages/registro/registro";
+import OlvidarPw1 from "../pages/olvidar-pw/olvidar-pw1";
+import OlvidarPw2 from "../pages/olvidar-pw/olvidar-pw2";
 
 
 /**
@@ -31,9 +33,10 @@ const RoutesAirFilms: React.FC = () => {
         
         {/* Rutas SIN Layout (Login standalone) */}
         <Route path="/inicio-sesion" element={<InicioSesion />} />
-        <Route path="/olvidar-pw1" element={<div style={{color: 'white', padding: '2rem'}}>Recuperar contraseña (próximamente)</div>} />
         <Route path= "/perfil" element={<div style={{color: 'white', padding: '2rem'}}>Perfil de usuario (próximamente)</div>} />
         <Route path= "/registro" element={<Registro />} />
+        <Route path= "/olvidar-pw1" element={<OlvidarPw1 />} />
+        <Route path= "/olvidar-pw2" element={<OlvidarPw2 />} />
 
         {/* 404 */}
         <Route path="*" element={<LayoutAirFilms><h2 style={{color: 'white', padding: '2rem'}}>Página no encontrada</h2></LayoutAirFilms>} />
