@@ -1,10 +1,10 @@
 .layout-airfilms {
-  min-height: 100vh;    
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #0a0a0a;
+  background: var(--fondo-oscuro);
 
-  &__content {
+  &__contenido {
     flex: 1;
     width: 100%;
   }
