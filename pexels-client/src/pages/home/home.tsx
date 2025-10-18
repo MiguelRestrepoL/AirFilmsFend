@@ -188,32 +188,6 @@ const HomePage: React.FC = () => {
   }, [estaAutenticado, estaCargando]);
 
   /**
-   * Maneja el cierre de sesión
-   */
-  const handleCerrarSesion = async () => {
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
-      const token = localStorage.getItem("authToken");
-
-      if (token) {
-        await fetch(`${apiUrl}/auth/logout`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-      }
-
-      localStorage.removeItem("authToken");
-      setEstaAutenticado(false);
-      setUsuario(null);
-      navigate("/");
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
-
-  /**
    * Navega a categoría
    */
   const handleCategoryClick = (category: string) => {
@@ -255,12 +229,7 @@ const HomePage: React.FC = () => {
               >
                 Explorar Películas
               </button>
-              <button 
-                className="home-page__btn home-page__btn--secondary"
-                onClick={handleCerrarSesion}
-              >
-                Cerrar Sesión
-              </button>
+              
             </div>
           </div>
         </section>
@@ -272,27 +241,27 @@ const HomePage: React.FC = () => {
             <h2 className="home-page__section-title">Explorar por Categoría</h2>
             <div className="home-page__categories-scroll">
               <button className="home-page__category-card" onClick={() => handleCategoryClick("action")}>
-                <div className="home-page__category-icon">💥</div>
+                <div className="home-page__category-icon"></div>
                 <span>Acción</span>
               </button>
               <button className="home-page__category-card" onClick={() => handleCategoryClick("comedy")}>
-                <div className="home-page__category-icon">😂</div>
+                <div className="home-page__category-icon"></div>
                 <span>Comedia</span>
               </button>
               <button className="home-page__category-card" onClick={() => handleCategoryClick("drama")}>
-                <div className="home-page__category-icon">🎭</div>
+                <div className="home-page__category-icon"></div>
                 <span>Drama</span>
               </button>
               <button className="home-page__category-card" onClick={() => handleCategoryClick("science fiction")}>
-                <div className="home-page__category-icon">🚀</div>
+                <div className="home-page__category-icon"></div>
                 <span>Sci-Fi</span>
               </button>
               <button className="home-page__category-card" onClick={() => handleCategoryClick("documentary")}>
-                <div className="home-page__category-icon">📽️</div>
+                <div className="home-page__category-icon"></div>
                 <span>Documentales</span>
               </button>
               <button className="home-page__category-card" onClick={() => handleCategoryClick("nature")}>
-                <div className="home-page__category-icon">🌿</div>
+                <div className="home-page__category-icon"></div>
                 <span>Naturaleza</span>
               </button>
             </div>
