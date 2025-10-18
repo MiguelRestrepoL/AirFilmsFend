@@ -18,7 +18,9 @@
     gap: 2rem;
   }
 
-  // Logo - TEXTO NARANJA
+  // ============================================
+  // LOGO
+  // ============================================
   &__logo {
     flex-shrink: 0;
     text-decoration: none;
@@ -31,7 +33,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      color: #ff7043;
+      opacity: 0.8;
     }
 
     img {
@@ -39,15 +41,77 @@
     }
   }
 
-  // Links - CENTRADOS
-  &__links {
+  &__logo-text {
+    background: var(--gradiente-principal);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  // ============================================
+  // SEARCH BAR (solo cuando está autenticado)
+  // ============================================
+  &__search {
     flex: 1;
+    max-width: 500px;
+    position: relative;
     display: flex;
-    justify-content: center;
+    align-items: center;
+
+    @media (max-width: 968px) {
+      max-width: 400px;
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 1rem;
+    width: 20px;
+    height: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+  }
+
+  &__search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    &:hover {
+      border-color: var(--naranja-primario);
+      background: rgba(228, 91, 18, 0.05);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--naranja-primario);
+      background: rgba(228, 91, 18, 0.1);
+    }
+  }
+
+  // ============================================
+  // LINKS - DESKTOP
+  // ============================================
+  &__links {
+    display: flex;
     align-items: center;
     gap: 2rem;
 
-    @media (max-width: 768px) {
+    @media (max-width: 968px) {
       display: none;
     }
   }
@@ -87,7 +151,9 @@
     }
   }
 
-  // Botones de Acciones - DERECHA
+  // ============================================
+  // BOTONES - NAVBAR NO AUTENTICADO
+  // ============================================
   &__actions {
     flex-shrink: 0;
     display: flex;
@@ -108,44 +174,239 @@
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
-  }
-
-  &__button--secondary {
-    background: linear-gradient(135deg, #ff5722, #ff7043) !important;
-    color: white !important;
-
-    &:hover {
-      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.6);
-      transform: translateY(-2px);
-    }
+    text-decoration: none;
+    display: inline-block;
   }
 
   &__button--primary {
-    background: linear-gradient(135deg, #ff5722, #ff7043) !important;
-    color: white !important;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
 
     &:hover {
-      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.6);
-      transform: translateY(-2px);
+      border-color: var(--naranja-primario);
+      color: var(--naranja-primario);
     }
   }
 
   &__button--accent {
-    background: linear-gradient(135deg, #ff5722, #ff7043) !important;
-    color: white !important;
+    background: var(--gradiente-principal);
+    color: white;
 
     &:hover {
-      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.6);
+      box-shadow: 0 4px 15px rgba(228, 91, 18, 0.6);
       transform: translateY(-2px);
     }
   }
 
+  &__button--danger {
+    background: rgba(255, 68, 68, 0.1);
+    border: 2px solid #ff4444;
+    color: #ff4444;
+
+    &:hover {
+      background: rgba(255, 68, 68, 0.2);
+    }
+  }
+
   &__button:focus-visible {
-    outline: 2px solid white;
+    outline: 2px solid var(--naranja-primario);
     outline-offset: 2px;
   }
 
-  // Botón Hamburguesa - MÓVIL
+  // ============================================
+  // USER SECTION - NAVBAR AUTENTICADO
+  // ============================================
+  &__user-section {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__settings-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    &:hover {
+      background: rgba(228, 91, 18, 0.1);
+      border-color: var(--naranja-primario);
+      transform: rotate(45deg);
+
+      svg {
+        color: var(--naranja-primario);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--naranja-primario);
+      outline-offset: 2px;
+    }
+  }
+
+  // ============================================
+  // AVATAR Y DROPDOWN
+  // ============================================
+  &__profile-dropdown {
+    position: relative;
+  }
+
+  &__avatar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gradiente-principal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--naranja-primario);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    color: white;
+    font-weight: 700;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(228, 91, 18, 0.5);
+    }
+
+    &--large {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Dropdown Menu
+  &__dropdown-menu {
+    position: absolute;
+    top: calc(100% + 1rem);
+    right: 0;
+    width: 280px;
+    background: rgba(18, 18, 23, 0.98);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(228, 91, 18, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    animation: dropdownFadeIn 0.3s ease;
+    z-index: 1000;
+
+    @keyframes dropdownFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  &__dropdown-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 1rem;
+  }
+
+  &__user-name {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0 0 0.25rem;
+  }
+
+  &__user-email {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+  }
+
+  &__badge {
+    display: inline-block;
+    background: rgba(228, 91, 18, 0.2);
+    border: 1px solid var(--naranja-primario);
+    color: var(--naranja-primario);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.75rem 0;
+  }
+
+  &__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    font-size: 0.95rem;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: rgba(228, 91, 18, 0.1);
+      color: var(--naranja-primario);
+    }
+
+    &--danger {
+      color: #ff4444;
+
+      &:hover {
+        background: rgba(255, 68, 68, 0.1);
+        color: #ff6666;
+      }
+    }
+  }
+
+  // ============================================
+  // MENÚ MÓVIL
+  // ============================================
   &__menu-toggle {
     display: none;
     flex-shrink: 0;
@@ -228,7 +489,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 87, 34, 0.1);
+      background: rgba(228, 91, 18, 0.1);
       color: var(--naranja-primario);
     }
   }
@@ -241,14 +502,13 @@
 }
 
 // ============================================
-// RESPONSIVE AJUSTES
+// RESPONSIVE
 // ============================================
 @media (max-width: 768px) {
   .navbar {
     &__container {
       padding: 0 1.5rem;
       height: 70px;
-      gap: 1rem;
     }
 
     &__logo {
