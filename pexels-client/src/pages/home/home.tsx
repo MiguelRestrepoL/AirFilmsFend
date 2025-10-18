@@ -324,16 +324,7 @@ const HomePage: React.FC = () => {
           </section>
 
           {/* Info del Usuario */}
-          <section className="home-page__user-info">
-            <div className="home-page__info-card">
-              <h3>Tu Perfil</h3>
-              <div className="home-page__profile-details">
-                <p><strong>Nombre:</strong> {usuario.name} {usuario.lastName}</p>
-                <p><strong>Email:</strong> {usuario.email}</p>
-                <p><strong>Edad:</strong> {usuario.age} años</p>
-              </div>
-            </div>
-          </section>
+          
         </div>
       </div>
     );
