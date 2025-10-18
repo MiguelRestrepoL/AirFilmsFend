@@ -23,6 +23,8 @@ const OlvidarPw2: React.FC = () => {
   const [isValidating, setIsValidating] = useState(true);
   const [tokenValid, setTokenValid] = useState(false);
   const [redirectCountdown, setRedirectCountdown] = useState(3);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successCountdown, setSuccessCountdown] = useState(3);
 
   /**
    * Valida el token al cargar el componente
@@ -49,9 +51,7 @@ const OlvidarPw2: React.FC = () => {
     validateToken();
   }, [token]);
 
-  /**
-   * Countdown y redirección automática si el token es inválido
-   */
+  // Countdown para token inválido
   useEffect(() => {
     if (!isValidating && !tokenValid) {
       const timer = setInterval(() => {
@@ -69,15 +69,32 @@ const OlvidarPw2: React.FC = () => {
     }
   }, [isValidating, tokenValid, navigate]);
 
-  /**
-   * Maneja cambios en los inputs
-   */
+  // Countdown para éxito
+  useEffect(() => {
+    if (showSuccess) {
+      const timer = setInterval(() => {
+        setSuccessCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            navigate("/inicio-sesion");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [showSuccess, navigate]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    // Limpiar error al escribir
+    if (error) setError(null);
   };
 
   /**
@@ -129,10 +146,8 @@ const OlvidarPw2: React.FC = () => {
         throw new Error(data.message || "Error al restablecer la contraseña");
       }
 
-      // CORREGIDO: /inicio-sesion en lugar de /login
-      navigate("/inicio-sesion", {
-        state: { message: "¡Contraseña restablecida exitosamente! Ya puedes iniciar sesión." }
-      });
+      // Mostrar mensaje de éxito
+      setShowSuccess(true);
     } catch (err: any) {
       console.error("Error al restablecer contraseña:", err);
       setError(err.message || "Error al restablecer la contraseña. Intenta nuevamente.");
@@ -141,20 +156,27 @@ const OlvidarPw2: React.FC = () => {
     }
   };
 
-  // Mostrar loading mientras valida el token
+  // Manejo de teclado para cerrar dropdown con Escape
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && (showSuccess || error)) {
+      setShowSuccess(false);
+      setError(null);
+    }
+  };
+
   if (isValidating) {
     return (
-      <div className="olvidar-pw2">
+      <div className="olvidar-pw2" role="main">
         <div className="olvidar-pw2__card">
           <div className="olvidar-pw2__logo-container">
             <img 
               src="/AirFilms.png" 
-              alt="AirFilms Logo" 
+              alt="AirFilms - Logotipo de la plataforma" 
               className="olvidar-pw2__logo-img"
             />
           </div>
-          <div className="olvidar-pw2__validating">
-            <div className="olvidar-pw2__spinner"></div>
+          <div className="olvidar-pw2__validating" role="status" aria-live="polite">
+            <div className="olvidar-pw2__spinner" aria-hidden="true"></div>
             <p>Validando enlace...</p>
           </div>
         </div>
@@ -165,44 +187,94 @@ const OlvidarPw2: React.FC = () => {
   // Mostrar error si el token es inválido
   if (!tokenValid) {
     return (
-      <div className="olvidar-pw2">
+      <div className="olvidar-pw2" role="main">
         <div className="olvidar-pw2__card">
           <div className="olvidar-pw2__logo-container">
             <img 
               src="/AirFilms.png" 
-              alt="AirFilms Logo" 
+              alt="AirFilms - Logotipo de la plataforma" 
               className="olvidar-pw2__logo-img"
             />
           </div>
 
-          <div className="olvidar-pw2__icon-container olvidar-pw2__icon-container--error">
+          <div className="olvidar-pw2__icon-container olvidar-pw2__icon-container--error" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
             </svg>
           </div>
 
-          <div className="olvidar-pw2__error-card">
-            <h2 className="olvidar-pw2__error-title">Acceso denegado</h2>
+          <div className="olvidar-pw2__error-card" role="alert" aria-live="assertive">
+            <h1 className="olvidar-pw2__error-title">Acceso denegado</h1>
             <p className="olvidar-pw2__error-text">
               El enlace de recuperación es inválido o ha expirado. 
               Por favor, solicita un nuevo enlace.
             </p>
 
-            <Link to="/olvidar-pw1" className="olvidar-pw2__action-btn">
+            <Link 
+              to="/olvidar-pw1" 
+              className="olvidar-pw2__action-btn"
+              aria-label="Ir a solicitar nuevo enlace de recuperación"
+            >
               Solicitar nuevo enlace
             </Link>
 
-            <p className="olvidar-pw2__redirect-text">
-              Redirigiendo en <strong>{redirectCountdown}</strong> segundos...
+            <p className="olvidar-pw2__redirect-text" aria-live="polite">
+              Redirigiendo en <strong>{redirectCountdown}</strong> segundo{redirectCountdown !== 1 ? 's' : ''}...
             </p>
           </div>
 
-          <div className="olvidar-pw2__links">
+          <nav className="olvidar-pw2__links" aria-label="Enlaces de navegación">
             <Link to="/inicio-sesion" className="olvidar-pw2__link">
               Iniciar sesión
             </Link>
             <Link to="/olvidar-pw1" className="olvidar-pw2__link">
               Recuperar contraseña
+            </Link>
+          </nav>
+        </div>
+      </div>
+    );
+  }
+
+  // Pantalla de éxito
+  if (showSuccess) {
+    return (
+      <div className="olvidar-pw2" role="main">
+        <div className="olvidar-pw2__card">
+          <div className="olvidar-pw2__logo-container">
+            <img 
+              src="/AirFilms.png" 
+              alt="AirFilms - Logotipo de la plataforma" 
+              className="olvidar-pw2__logo-img"
+            />
+          </div>
+
+          <div className="olvidar-pw2__icon-container olvidar-pw2__icon-container--success" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+
+          <div className="olvidar-pw2__success-card" role="status" aria-live="polite">
+            <h1 className="olvidar-pw2__success-title">¡Contraseña restablecida!</h1>
+            <p className="olvidar-pw2__success-text">
+              Tu contraseña ha sido actualizada exitosamente. 
+              Ya puedes iniciar sesión con tu nueva contraseña.
+            </p>
+
+            <div className="olvidar-pw2__success-info">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <p>Redirigiendo a inicio de sesión en <strong>{successCountdown}</strong>...</p>
+            </div>
+
+            <Link 
+              to="/inicio-sesion" 
+              className="olvidar-pw2__action-btn olvidar-pw2__action-btn--success"
+              aria-label="Ir a iniciar sesión ahora"
+            >
+              Iniciar sesión ahora
             </Link>
           </div>
         </div>
@@ -212,45 +284,55 @@ const OlvidarPw2: React.FC = () => {
 
   // Formulario de restablecimiento
   return (
-    <div className="olvidar-pw2">
+    <div className="olvidar-pw2" role="main" onKeyDown={handleKeyDown}>
       <div className="olvidar-pw2__card">
         <div className="olvidar-pw2__logo-container">
           <img 
             src="/AirFilms.png" 
-            alt="AirFilms Logo" 
+            alt="AirFilms - Logotipo de la plataforma" 
             className="olvidar-pw2__logo-img"
           />
         </div>
 
-        <div className="olvidar-pw2__icon-container">
+        <div className="olvidar-pw2__icon-container" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
           </svg>
         </div>
 
-        <div className="olvidar-pw2__header">
-          <h2 className="olvidar-pw2__title">Restablecer contraseña</h2>
+        <header className="olvidar-pw2__header">
+          <h1 className="olvidar-pw2__title">Restablecer contraseña</h1>
           <p className="olvidar-pw2__subtitle">
             Ingresa tu nueva contraseña
           </p>
-        </div>
+        </header>
 
         {error && (
-          <div className="olvidar-pw2__error">
-            <svg viewBox="0 0 24 24" fill="currentColor">
+          <div 
+            className="olvidar-pw2__error" 
+            role="alert" 
+            aria-live="assertive"
+            tabIndex={-1}
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
             </svg>
             <span>{error}</span>
           </div>
         )}
 
-        <form className="olvidar-pw2__form" onSubmit={handleSubmit}>
+        <form 
+          className="olvidar-pw2__form" 
+          onSubmit={handleSubmit}
+          noValidate
+          aria-label="Formulario de restablecimiento de contraseña"
+        >
           <div className="olvidar-pw2__form-group">
             <label htmlFor="password" className="olvidar-pw2__label">
               Nueva contraseña
             </label>
             <div className="olvidar-pw2__input-wrapper">
-              <svg className="olvidar-pw2__input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="olvidar-pw2__input-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
               </svg>
               <input
@@ -263,9 +345,13 @@ const OlvidarPw2: React.FC = () => {
                 onChange={handleChange}
                 disabled={isLoading}
                 autoComplete="new-password"
+                required
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby="password-hint"
               />
             </div>
-            <small className="olvidar-pw2__hint">
+            <small id="password-hint" className="olvidar-pw2__hint">
               Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (@$!%*?&)
             </small>
           </div>
@@ -275,7 +361,7 @@ const OlvidarPw2: React.FC = () => {
               Confirmar contraseña
             </label>
             <div className="olvidar-pw2__input-wrapper">
-              <svg className="olvidar-pw2__input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="olvidar-pw2__input-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
               </svg>
               <input
@@ -288,6 +374,9 @@ const OlvidarPw2: React.FC = () => {
                 onChange={handleChange}
                 disabled={isLoading}
                 autoComplete="new-password"
+                required
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
               />
             </div>
           </div>
@@ -296,16 +385,17 @@ const OlvidarPw2: React.FC = () => {
             type="submit"
             className="olvidar-pw2__submit-btn"
             disabled={isLoading}
+            aria-label={isLoading ? "Restableciendo contraseña, por favor espera" : "Restablecer contraseña"}
           >
             {isLoading ? (
-              <div className="olvidar-pw2__loading">
-                <div className="olvidar-pw2__spinner"></div>
+              <span className="olvidar-pw2__loading">
+                <span className="olvidar-pw2__spinner" aria-hidden="true"></span>
                 <span>Restableciendo...</span>
-              </div>
+              </span>
             ) : (
               <>
                 <span>Restablecer contraseña</span>
-                <svg viewBox="0 0 24 24" fill="currentColor">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
               </>
@@ -313,14 +403,14 @@ const OlvidarPw2: React.FC = () => {
           </button>
         </form>
 
-        <div className="olvidar-pw2__links">
+        <nav className="olvidar-pw2__links" aria-label="Enlaces de navegación">
           <Link to="/inicio-sesion" className="olvidar-pw2__link">
             Iniciar sesión
           </Link>
           <Link to="/olvidar-pw1" className="olvidar-pw2__link">
             Recuperar contraseña
           </Link>
-        </div>
+        </nav>
       </div>
     </div>
   );
