@@ -322,9 +322,6 @@ const HomePage: React.FC = () => {
               ))}
             </div>
           </section>
-
-          {/* Info del Usuario */}
-          
         </div>
       </div>
     );

@@ -198,7 +198,7 @@ const Navbar: React.FC = () => {
                     <div className="navbar__avatar navbar__avatar--large">
                       <span>{usuario.name?.charAt(0).toUpperCase() || "U"}</span>
                     </div>
-                    <p className="navbar__user-name">{usuario.name} {usuario.lastName}</p>
+                    <p><strong>{usuario.name}</strong></p>
                     <p className="navbar__user-email">{usuario.email}</p>
                     <span className="navbar__badge">Próximamente...</span>
                   </div>
