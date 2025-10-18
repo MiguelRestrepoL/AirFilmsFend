@@ -549,12 +549,82 @@
   }
 }
 
+// ============================================
+// RESPONSIVE FIXES
+// ============================================
+@media (max-width: 968px) {
+  .registro {
+    padding: 0.5rem; // Muy poco padding
+    align-items: flex-start; // Alinear arriba
+    
+    &__container {
+      gap: 1rem; // Gap mínimo
+      padding-top: 0.5rem;
+    }
+
+    &__branding {
+      padding: 0.5rem; // Padding mínimo
+      min-height: auto;
+    }
+
+    &__logo-container {
+      margin-bottom: 0.5rem; // Margen mínimo
+    }
+
+    &__logo-img {
+      max-width: 120px; // Logo MUY pequeño
+    }
+
+    &__welcome {
+      margin-bottom: 0;
+    }
+
+    &__welcome-title {
+      font-size: 1.1rem; // Texto pequeño
+      margin-bottom: 0;
+    }
+
+    &__welcome-text {
+      display: none; // Ocultar texto extra
+    }
+
+    &__features {
+      display: none; // Ocultar features
+    }
+
+    &__form-container {
+      padding: 1.5rem 1rem;
+      max-height: none; // Permitir scroll natural
+    }
+
+    &__animated-bg {
+      display: none; // Ocultar círculos animados
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .registro {
-    padding: 1rem;
+    padding: 0.25rem;
 
     &__container {
-      border-radius: 20px;
+      gap: 0.75rem;
+    }
+
+    &__branding {
+      padding: 0.5rem;
+    }
+
+    &__logo-img {
+      max-width: 100px; // Logo SÚPER pequeño
+    }
+
+    &__welcome-title {
+      font-size: 1rem;
+    }
+
+    &__form-container {
+      padding: 1.25rem 0.875rem;
     }
 
     &__form {

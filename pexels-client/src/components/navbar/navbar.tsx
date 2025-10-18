@@ -43,16 +43,10 @@ const Navbar: React.FC = () => {
 
         {/* Botones Desktop */}
         <div className="navbar__actions">
-          <button 
-            className="navbar__button navbar__button--secondary"
-            onClick={() => window.location.href = '/sobre-nosotros#contacto'}
-          >
-            Contacto
-          </button>
           <Link to="/inicio-sesion" className="navbar__button navbar__button--primary">
             Iniciar Sesión
           </Link>
-          <Link to="/registrarse" className="navbar__button navbar__button--accent">
+          <Link to="/registro" className="navbar__button navbar__button--accent">
             Registrarse
           </Link>
         </div>
