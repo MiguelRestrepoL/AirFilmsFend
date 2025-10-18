@@ -36,7 +36,7 @@ const OlvidarPw2: React.FC = () => {
       }
 
       try {
-        // Simular validación del token (en producción deberías validar con el backend)
+        // Simular validación del token
         await new Promise(resolve => setTimeout(resolve, 1000));
         setTokenValid(true);
       } catch (err) {
@@ -93,8 +93,13 @@ const OlvidarPw2: React.FC = () => {
       return;
     }
 
-    if (formData.password.length < 8 || !/[A-Z]/.test(formData.password) || !/\d/.test(formData.password) || !/[^A-Za-z0-9]/.test(formData.password)) {
-      setError("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial");
+    // Validación según el backend: mínimo 8, mayúscula, minúscula, número, carácter especial
+    if (formData.password.length < 8 || 
+        !/[A-Z]/.test(formData.password) || 
+        !/[a-z]/.test(formData.password) ||
+        !/\d/.test(formData.password) || 
+        !/[@$!%*?&]/.test(formData.password)) {
+      setError("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)");
       return;
     }
 
@@ -124,8 +129,8 @@ const OlvidarPw2: React.FC = () => {
         throw new Error(data.message || "Error al restablecer la contraseña");
       }
 
-      // Redirigir al login con mensaje de éxito
-      navigate("/login", {
+      // CORREGIDO: /inicio-sesion en lugar de /login
+      navigate("/inicio-sesion", {
         state: { message: "¡Contraseña restablecida exitosamente! Ya puedes iniciar sesión." }
       });
     } catch (err: any) {
@@ -193,7 +198,7 @@ const OlvidarPw2: React.FC = () => {
           </div>
 
           <div className="olvidar-pw2__links">
-            <Link to="/login" className="olvidar-pw2__link">
+            <Link to="/inicio-sesion" className="olvidar-pw2__link">
               Iniciar sesión
             </Link>
             <Link to="/olvidar-pw1" className="olvidar-pw2__link">
@@ -261,7 +266,7 @@ const OlvidarPw2: React.FC = () => {
               />
             </div>
             <small className="olvidar-pw2__hint">
-              Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo
+              Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (@$!%*?&)
             </small>
           </div>
 
@@ -309,7 +314,7 @@ const OlvidarPw2: React.FC = () => {
         </form>
 
         <div className="olvidar-pw2__links">
-          <Link to="/login" className="olvidar-pw2__link">
+          <Link to="/inicio-sesion" className="olvidar-pw2__link">
             Iniciar sesión
           </Link>
           <Link to="/olvidar-pw1" className="olvidar-pw2__link">
