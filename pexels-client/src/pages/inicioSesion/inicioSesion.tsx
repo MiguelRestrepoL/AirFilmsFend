@@ -142,7 +142,7 @@ const InicioSesion: React.FC = () => {
 
             <div className="inicio-sesion__forgot-password-container">
               <Link 
-                to="/recuperar-password" 
+                to="/olvidar-pw1" 
                 className="inicio-sesion__forgot-password"
               >
                 ¿Olvidó su contraseña?
