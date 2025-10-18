@@ -29,9 +29,13 @@ const HomePage: React.FC = () => {
       try {
         const token = localStorage.getItem("authToken");
         
+        console.log("🔍 Verificando token:", token ? "✅ Token encontrado" : "❌ No hay token");
+        
         if (token) {
           // Verificar token con el backend
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
+          
+          console.log("📡 Verificando token con:", `${apiUrl}/auth/verify-auth`);
           
           try {
             const response = await fetch(`${apiUrl}/auth/verify-auth`, {
@@ -40,58 +44,89 @@ const HomePage: React.FC = () => {
               }
             });
 
+            console.log("📥 Respuesta verify-auth:", response.status);
+
             if (response.ok) {
               const data = await response.json();
+              console.log("✅ Token válido:", data);
+              
               if (data.success) {
                 // Token válido, ahora obtenemos el perfil
-                const profileResponse = await fetch(`${apiUrl}/user/profile`, {
-                  headers: {
-                    "Authorization": `Bearer ${token}`
-                  }
-                });
+                try {
+                  const profileResponse = await fetch(`${apiUrl}/user/profile`, {
+                    headers: {
+                      "Authorization": `Bearer ${token}`
+                    }
+                  });
 
-                if (profileResponse.ok) {
-                  const profileData = await profileResponse.json();
-                  if (profileData.success && profileData.user) {
-                    setUsuario(profileData.user);
-                    setEstaAutenticado(true);
+                  console.log("📥 Respuesta perfil:", profileResponse.status);
+
+                  if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    console.log("👤 Datos de perfil:", profileData);
+                    
+                    if (profileData.success && profileData.user) {
+                      setUsuario(profileData.user);
+                      setEstaAutenticado(true);
+                      console.log("✅ Usuario autenticado:", profileData.user.name);
+                    } else {
+                      // Si no hay perfil pero el token es válido, igual autenticamos
+                      setEstaAutenticado(true);
+                      setUsuario({ name: "Usuario" });
+                      console.log("⚠️ Token válido pero sin perfil completo");
+                    }
                   } else {
-                    // Si no hay perfil pero el token es válido, igual autenticamos
+                    console.warn("⚠️ Error al obtener perfil, pero token es válido");
                     setEstaAutenticado(true);
                     setUsuario({ name: "Usuario" });
                   }
-                } else {
-                  setEstaAutenticado(false);
-                  localStorage.removeItem("authToken");
+                } catch (profileErr) {
+                  console.error("❌ Error al cargar perfil:", profileErr);
+                  setEstaAutenticado(true);
+                  setUsuario({ name: "Usuario" });
                 }
               } else {
+                console.warn("❌ Token inválido, eliminando...");
                 setEstaAutenticado(false);
                 localStorage.removeItem("authToken");
               }
             } else {
+              console.warn("❌ Token inválido (status " + response.status + "), eliminando...");
               setEstaAutenticado(false);
               localStorage.removeItem("authToken");
             }
           } catch (err) {
-            console.error("Error al verificar token:", err);
+            console.error("❌ Error al verificar token:", err);
             // Si hay error de red pero tenemos token, asumimos autenticado temporalmente
-            if (token) {
-              setEstaAutenticado(true);
-              setUsuario({ name: "Usuario" });
-            }
+            console.log("⚠️ Error de red, manteniendo sesión temporal");
+            setEstaAutenticado(true);
+            setUsuario({ name: "Usuario" });
           }
         } else {
+          console.log("ℹ️ No hay token, usuario no autenticado");
           setEstaAutenticado(false);
         }
       } catch (error) {
-        console.error("Error al verificar autenticación:", error);
+        console.error("❌ Error general en verificación:", error);
         setEstaAutenticado(false);
       } finally {
+        console.log("✅ Verificación completada, estaCargando = false");
         setEstaCargando(false);
       }
     };
 
     verificarAutenticacion();
+
+    // Escuchar cambios en localStorage (cuando se hace login/logout en otra pestaña)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "authToken") {
+        console.log("🔄 Token cambió en localStorage, re-verificando...");
+        verificarAutenticacion();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   /**
@@ -103,37 +138,45 @@ const HomePage: React.FC = () => {
     const cargarVideos = async () => {
       try {
         setError(null);
-        const apiUrl = import.meta.env.VITE_API_LOCAL_URL;
-        
-        if (!apiUrl) {
-          throw new Error("URL de API no configurada");
-        }
+        const apiUrl = import.meta.env.VITE_API_LOCAL_URL || import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
 
         if (estaAutenticado) {
           // Usuario autenticado: cargar más videos
-          const urlRecomendados = `${apiUrl}/videos/search?query=popular`;
-          const respuestaRecomendados = await fetch(urlRecomendados);
-          
-          if (respuestaRecomendados.ok) {
-            const datosRecomendados = await respuestaRecomendados.json();
-            setVideosRecomendados(Array.isArray(datosRecomendados) ? datosRecomendados.slice(0, 6) : []);
+          try {
+            const urlRecomendados = `${apiUrl}/videos/search?query=popular`;
+            const respuestaRecomendados = await fetch(urlRecomendados);
+            
+            if (respuestaRecomendados.ok) {
+              const datosRecomendados = await respuestaRecomendados.json();
+              setVideosRecomendados(Array.isArray(datosRecomendados) ? datosRecomendados.slice(0, 6) : []);
+            }
+          } catch (err) {
+            console.error("Error al cargar recomendados:", err);
           }
 
-          const urlRecientes = `${apiUrl}/videos/search?query=nature`;
-          const respuestaRecientes = await fetch(urlRecientes);
-          
-          if (respuestaRecientes.ok) {
-            const datosRecientes = await respuestaRecientes.json();
-            setVideosDestacados(Array.isArray(datosRecientes) ? datosRecientes.slice(0, 4) : []);
+          try {
+            const urlRecientes = `${apiUrl}/videos/search?query=nature`;
+            const respuestaRecientes = await fetch(urlRecientes);
+            
+            if (respuestaRecientes.ok) {
+              const datosRecientes = await respuestaRecientes.json();
+              setVideosDestacados(Array.isArray(datosRecientes) ? datosRecientes.slice(0, 4) : []);
+            }
+          } catch (err) {
+            console.error("Error al cargar recientes:", err);
           }
         } else {
           // Usuario NO autenticado: solo 4 videos destacados
-          const url = `${apiUrl}/videos/search?query=popular`;
-          const respuesta = await fetch(url);
-          
-          if (respuesta.ok) {
-            const datos = await respuesta.json();
-            setVideosDestacados(Array.isArray(datos) ? datos.slice(0, 4) : []);
+          try {
+            const url = `${apiUrl}/videos/search?query=popular`;
+            const respuesta = await fetch(url);
+            
+            if (respuesta.ok) {
+              const datos = await respuesta.json();
+              setVideosDestacados(Array.isArray(datos) ? datos.slice(0, 4) : []);
+            }
+          } catch (err) {
+            console.error("Error al cargar destacados:", err);
           }
         }
       } catch (err: any) {
