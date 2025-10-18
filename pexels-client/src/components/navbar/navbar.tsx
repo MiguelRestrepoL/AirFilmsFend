@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
 
 /**
@@ -23,20 +23,76 @@ const Navbar: React.FC = () => {
 
   // Verificar si hay token al cargar
   useEffect(() => {
-    const token = localStorage.getItem("airfilms_token");
-    const userStr = localStorage.getItem("airfilms_user");
+    const verificarAutenticacion = async () => {
+      const token = localStorage.getItem("authToken");
 
-    if (token && userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        setUsuario(user);
-        setEstaAutenticado(true);
-      } catch {
-        // Si hay error parseando, limpiar
-        localStorage.removeItem("airfilms_token");
-        localStorage.removeItem("airfilms_user");
+      if (token) {
+        try {
+          // Verificar token con el backend
+          const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
+          const response = await fetch(`${apiUrl}/auth/verify-auth`, {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              // Token válido, obtener perfil
+              try {
+                const profileResponse = await fetch(`${apiUrl}/user/profile`, {
+                  headers: {
+                    "Authorization": `Bearer ${token}`
+                  }
+                });
+
+                if (profileResponse.ok) {
+                  const profileData = await profileResponse.json();
+                  if (profileData.success && profileData.user) {
+                    setUsuario(profileData.user);
+                    setEstaAutenticado(true);
+                  } else {
+                    // Token válido pero sin perfil
+                    setUsuario({ name: "Usuario" });
+                    setEstaAutenticado(true);
+                  }
+                } else {
+                  throw new Error("Error al obtener perfil");
+                }
+              } catch (err) {
+                console.error("Error al cargar perfil:", err);
+                setUsuario({ name: "Usuario" });
+                setEstaAutenticado(true);
+              }
+            } else {
+              localStorage.removeItem("authToken");
+              setEstaAutenticado(false);
+            }
+          } else {
+            localStorage.removeItem("authToken");
+            setEstaAutenticado(false);
+          }
+        } catch (error) {
+          console.error("Error al verificar autenticación:", error);
+          // Si hay error de red pero hay token, asumir autenticado
+          setUsuario({ name: "Usuario" });
+          setEstaAutenticado(true);
+        }
+      } else {
+        setEstaAutenticado(false);
       }
-    }
+    };
+
+    verificarAutenticacion();
+
+    // Escuchar cambios en localStorage
+    const handleStorageChange = () => {
+      verificarAutenticacion();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const toggleMenu = () => {
@@ -48,12 +104,13 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("airfilms_token");
+    const token = localStorage.getItem("authToken");
 
     // Intentar logout en el backend
     if (token) {
       try {
-        await fetch("https://airfilms-server.onrender.com/api/auth/logout", {
+        const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
+        await fetch(`${apiUrl}/auth/logout`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -66,13 +123,14 @@ const Navbar: React.FC = () => {
     }
 
     // Limpiar localStorage
-    localStorage.removeItem("airfilms_token");
-    localStorage.removeItem("airfilms_user");
+    localStorage.removeItem("authToken");
     
     setEstaAutenticado(false);
     setUsuario(null);
-    navigate("/");
-    window.location.reload(); // Forzar recarga para actualizar todo
+    setMenuPerfilAbierto(false);
+    
+    // Redirigir y recargar
+    window.location.href = "/";
   };
 
   // ============================================
@@ -222,7 +280,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="navbar__actions">
-          <Link to="/inicio-sesion" className="navbar__button navbar__button--primary">
+          <Link to="/login" className="navbar__button navbar__button--primary">
             Iniciar Sesión
           </Link>
           <Link to="/registro" className="navbar__button navbar__button--accent">
@@ -249,7 +307,7 @@ const Navbar: React.FC = () => {
             <Link to="/sobre-nosotros" className="navbar__link-movil" onClick={toggleMenu}>Sobre Nosotros</Link>
           </div>
           <div className="navbar__actions-movil">
-            <Link to="/inicio-sesion" className="navbar__button navbar__button--primary" onClick={toggleMenu}>
+            <Link to="/login" className="navbar__button navbar__button--primary" onClick={toggleMenu}>
               Iniciar Sesión
             </Link>
             <Link to="/registro" className="navbar__button navbar__button--accent" onClick={toggleMenu}>

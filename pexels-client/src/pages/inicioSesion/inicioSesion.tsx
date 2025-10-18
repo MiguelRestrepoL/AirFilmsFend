@@ -58,8 +58,8 @@ const InicioSesion: React.FC = () => {
         localStorage.setItem("authToken", data.token);
       }
 
-      // Redirigir a la página principal
-      navigate("/");
+      // Redirigir a la página principal y forzar recarga
+      window.location.href = "/";
     } catch (err: any) {
       console.error("Error al iniciar sesión:", err);
       setError(err.message || "Error al iniciar sesión. Intenta nuevamente.");
@@ -79,6 +79,7 @@ const InicioSesion: React.FC = () => {
               src="/AirFilms.png" 
               alt="AirFilms Logo" 
               className="inicio-sesion__logo-img"
+              
             />
             </Link>
           </div>
@@ -141,7 +142,7 @@ const InicioSesion: React.FC = () => {
 
             <div className="inicio-sesion__forgot-password-container">
               <Link 
-                to="/olvidar-pw1" 
+                to="/recuperar-password" 
                 className="inicio-sesion__forgot-password"
               >
                 ¿Olvidó su contraseña?
