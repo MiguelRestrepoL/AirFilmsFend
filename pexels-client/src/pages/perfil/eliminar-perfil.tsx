@@ -40,7 +40,7 @@ const EliminarPerfil: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`${apiUrl}/user/profile`, {
+        const response = await fetch(`${apiUrl}/users/profile`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -103,7 +103,7 @@ const EliminarPerfil: React.FC = () => {
       const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch(`${apiUrl}/user/profile`, {
+      const response = await fetch(`${apiUrl}/users/profile`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
