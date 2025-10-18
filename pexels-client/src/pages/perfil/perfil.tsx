@@ -45,7 +45,7 @@ const Perfil: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`${apiUrl}/user/profile`, {
+        const response = await fetch(`${apiUrl}/users/profile`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -122,7 +122,7 @@ const Perfil: React.FC = () => {
       const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch(`${apiUrl}/user/profile`, {
+      const response = await fetch(`${apiUrl}/users/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ const Perfil: React.FC = () => {
       const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch(`${apiUrl}/user/profile`, {
+      const response = await fetch(`${apiUrl}/users/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

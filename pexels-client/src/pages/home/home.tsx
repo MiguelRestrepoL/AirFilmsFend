@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ResultadoBusquedaVideo } from "../../types/video.types";
@@ -53,7 +52,7 @@ const HomePage: React.FC = () => {
               if (data.success) {
                 // Token válido, ahora obtenemos el perfil
                 try {
-                  const profileResponse = await fetch(`${apiUrl}/user/profile`, {
+                  const profileResponse = await fetch(`${apiUrl}/users/profile`, {
                     headers: {
                       "Authorization": `Bearer ${token}`
                     }
