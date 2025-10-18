@@ -1,5 +1,27 @@
-# Logs
-logs
+# ───────────────
+# 📦 Dependencias y builds
+# ───────────────
+node_modules/
+dist/
+dist-ssr/
+build/
+.cache/
+.vite/
+
+# ───────────────
+# ⚙️ Configuración local
+# ───────────────
+*.local
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ───────────────
+# 🧠 Logs y reportes
+# ───────────────
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,18 +29,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# ───────────────
+# 🧑‍💻 Editores
+# ───────────────
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+Thumbs.db
+
+# ───────────────
+# 🧵 Sistemas temporales
+# ───────────────
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# ───────────────
+# 💅 Archivos generados por herramientas de estilo
+# ───────────────
+*.css.map
+*.scssc
+*.sass-cache/
