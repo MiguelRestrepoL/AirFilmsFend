@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAutenticacion } from "../../services/AutenticacionS";
-import "./navbar-autenticado.scss";
+import "./NavbarAutenticado.scss";
 
 /**
  * Barra de navegación para usuarios autenticados.
