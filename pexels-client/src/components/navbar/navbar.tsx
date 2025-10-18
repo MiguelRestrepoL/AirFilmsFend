@@ -30,6 +30,8 @@ const Navbar: React.FC = () => {
         try {
           // Verificar token con el backend
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
+          
+          // Verificar token
           const response = await fetch(`${apiUrl}/auth/verify-auth`, {
             headers: {
               "Authorization": `Bearer ${token}`
@@ -39,9 +41,9 @@ const Navbar: React.FC = () => {
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
-              // Token válido, obtener perfil
+              // Token válido, obtener perfil (CORREGIDO: /users/profile)
               try {
-                const profileResponse = await fetch(`${apiUrl}/user/profile`, {
+                const profileResponse = await fetch(`${apiUrl}/users/profile`, {
                   headers: {
                     "Authorization": `Bearer ${token}`
                   }
@@ -53,16 +55,18 @@ const Navbar: React.FC = () => {
                     setUsuario(profileData.user);
                     setEstaAutenticado(true);
                   } else {
-                    // Token válido pero sin perfil
-                    setUsuario({ name: "Usuario" });
+                    // Token válido pero sin perfil completo
+                    setUsuario({ name: "Usuario", email: "" });
                     setEstaAutenticado(true);
                   }
                 } else {
-                  throw new Error("Error al obtener perfil");
+                  console.warn("Error al obtener perfil");
+                  setUsuario({ name: "Usuario", email: "" });
+                  setEstaAutenticado(true);
                 }
               } catch (err) {
                 console.error("Error al cargar perfil:", err);
-                setUsuario({ name: "Usuario" });
+                setUsuario({ name: "Usuario", email: "" });
                 setEstaAutenticado(true);
               }
             } else {
@@ -75,8 +79,8 @@ const Navbar: React.FC = () => {
           }
         } catch (error) {
           console.error("Error al verificar autenticación:", error);
-          // Si hay error de red pero hay token, asumir autenticado
-          setUsuario({ name: "Usuario" });
+          // Si hay error de red pero hay token, asumir autenticado temporalmente
+          setUsuario({ name: "Usuario", email: "" });
           setEstaAutenticado(true);
         }
       } else {
@@ -198,8 +202,10 @@ const Navbar: React.FC = () => {
                     <div className="navbar__avatar navbar__avatar--large">
                       <span>{usuario.name?.charAt(0).toUpperCase() || "U"}</span>
                     </div>
-                    <p><strong>{usuario.name}</strong></p>
-                    <p className="navbar__user-email">{usuario.email}</p>
+                    <p className="navbar__user-name">{usuario.name || "Usuario"}</p>
+                    {usuario.email && (
+                      <p className="navbar__user-email">{usuario.email}</p>
+                    )}
                     <span className="navbar__badge">Próximamente...</span>
                   </div>
 
@@ -280,7 +286,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="navbar__actions">
-          <Link to="/inicio-sesion" className="navbar__button navbar__button--primary">
+          <Link to="/inicio-sesion" className="navbar__button navbar__button--accent">
             Iniciar Sesión
           </Link>
           <Link to="/registro" className="navbar__button navbar__button--accent">
@@ -307,7 +313,7 @@ const Navbar: React.FC = () => {
             <Link to="/sobre-nosotros" className="navbar__link-movil" onClick={toggleMenu}>Sobre Nosotros</Link>
           </div>
           <div className="navbar__actions-movil">
-            <Link to="/inicio-sesion" className="navbar__button navbar__button--primary" onClick={toggleMenu}>
+            <Link to="/inicio-sesion" className="navbar__button navbar__button--accent" onClick={toggleMenu}>
               Iniciar Sesión
             </Link>
             <Link to="/registro" className="navbar__button navbar__button--accent" onClick={toggleMenu}>
