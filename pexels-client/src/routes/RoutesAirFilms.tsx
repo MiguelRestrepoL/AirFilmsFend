@@ -1,3 +1,5 @@
+/** Imports de la aplicación AirFilms */
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import LayoutAirFilms from "../layout/LayoutAirFilms";
@@ -9,6 +11,8 @@ import InicioSesion from "../pages/inicioSesion/inicioSesion";
 import Registro from "../pages/registro/registro";
 import OlvidarPw1 from "../pages/olvidar-pw/olvidar-pw1";
 import OlvidarPw2 from "../pages/olvidar-pw/olvidar-pw2";
+import Perfil from "../pages/perfil/perfil";
+import EliminarPerfil from "../pages/perfil/eliminar-perfil";
 
 
 /**
@@ -30,6 +34,9 @@ const RoutesAirFilms: React.FC = () => {
         <Route path="/peliculas" element={<LayoutAirFilms><MoviePage /></LayoutAirFilms>} />
         <Route path="/sobre-nosotros" element={<LayoutAirFilms><AboutPage /></LayoutAirFilms>} />
         <Route path="/site-map" element={<LayoutAirFilms><SiteMapPage /></LayoutAirFilms>} />
+        <Route path="/perfil" element={<LayoutAirFilms><Perfil /></LayoutAirFilms>} />
+        <Route path="/eliminar-perfil" element={<LayoutAirFilms><EliminarPerfil /></LayoutAirFilms>} />
+      
         
         {/* Rutas SIN Layout (Login standalone) */}
         <Route path="/inicio-sesion" element={<InicioSesion />} />

@@ -1,0 +1,466 @@
+.eliminar-perfil {
+  min-height: 100vh;
+  background: var(--fondo-oscuro);
+  padding: 2rem 2rem 4rem;
+
+  &__container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  // ============================================
+  // LOGO
+  // ============================================
+  &__logo-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.6s ease;
+  }
+
+  &__logo {
+    max-width: 180px;
+    height: auto;
+    filter: drop-shadow(0 8px 20px rgba(244, 67, 54, 0.4));
+    transition: transform 0.3s ease;
+
+    @media (max-width: 768px) {
+      max-width: 150px;
+    }
+  }
+
+  // ============================================
+  // HEADER
+  // ============================================
+  &__header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.6s ease 0.1s both;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(244, 67, 54, 0.15);
+    border: 3px solid rgba(244, 67, 54, 0.4);
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+
+    svg {
+      width: 40px;
+      height: 40px;
+      color: #ff5252;
+    }
+  }
+
+  &__title {
+    font-size: 2.5rem;
+    color: #ff5252;
+    margin: 0 0 0.75rem;
+    font-weight: 700;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  &__subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+
+  // ============================================
+  // ADVERTENCIA CRÍTICA
+  // ============================================
+  &__warning {
+    background: rgba(244, 67, 54, 0.12);
+    border: 2px solid rgba(244, 67, 54, 0.4);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    gap: 1.5rem;
+    animation: fadeIn 0.6s ease 0.2s both;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+  }
+
+  &__warning-icon {
+    flex-shrink: 0;
+
+    svg {
+      width: 48px;
+      height: 48px;
+      color: #ff5252;
+    }
+
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
+
+  &__warning-content {
+    flex: 1;
+  }
+
+  &__warning-title {
+    font-size: 1.3rem;
+    color: #ff5252;
+    margin: 0 0 1rem;
+    font-weight: 700;
+  }
+
+  &__warning-text {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 1rem;
+    line-height: 1.6;
+  }
+
+  &__warning-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+  }
+
+  // ============================================
+  // INFORMACIÓN DE CUENTA
+  // ============================================
+  &__info {
+    background: rgba(100, 50, 150, 0.1);
+    border: 1px solid rgba(100, 50, 150, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    animation: fadeIn 0.6s ease 0.3s both;
+
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__info-title {
+    font-size: 1.2rem;
+    color: white;
+    margin: 0 0 1.5rem;
+    font-weight: 600;
+  }
+
+  &__info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  &__info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__info-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+  }
+
+  &__info-value {
+    font-size: 1rem;
+    color: white;
+    font-weight: 600;
+  }
+
+  // ============================================
+  // PASOS
+  // ============================================
+  &__steps {
+    background: rgba(255, 87, 34, 0.08);
+    border: 1px solid rgba(255, 87, 34, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    animation: fadeIn 0.6s ease 0.4s both;
+
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__steps-title {
+    font-size: 1.1rem;
+    color: #ff9800;
+    margin: 0 0 1.25rem;
+    font-weight: 600;
+  }
+
+  &__steps-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+
+    li {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+  }
+
+  // ============================================
+  // FORMULARIO
+  // ============================================
+  &__form {
+    animation: fadeIn 0.6s ease 0.5s both;
+  }
+
+  &__form-group {
+    margin-bottom: 2rem;
+  }
+
+  &__label {
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+
+  &__confirmation-hint {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin: 0 0 0.75rem;
+  }
+
+  &__phrase-box {
+    background: rgba(244, 67, 54, 0.2);
+    border: 2px solid rgba(244, 67, 54, 0.5);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    color: #ff5252;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 1.1rem 1.35rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    &:focus {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: #ff5722;
+      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.12);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // ============================================
+  // CHECKBOX
+  // ============================================
+  &__checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(244, 67, 54, 0.08);
+    border: 2px solid rgba(244, 67, 54, 0.3);
+    border-radius: 12px;
+  }
+
+  &__checkbox {
+    margin-top: 0.25rem;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__checkbox-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    cursor: pointer;
+  }
+
+  // ============================================
+  // MENSAJES DE ERROR
+  // ============================================
+  &__error {
+    background: rgba(244, 67, 54, 0.16);
+    border: 1px solid rgba(244, 67, 54, 0.45);
+    color: #ff5252;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    animation: shake 0.5s ease;
+
+    svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+  }
+
+  // ============================================
+  // BOTONES
+  // ============================================
+  &__actions {
+    display: flex;
+    gap: 1.25rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column-reverse;
+      gap: 1rem;
+    }
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 1.2rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    letter-spacing: 0.3px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    &--cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: translateY(-2px);
+      }
+    }
+
+    &--delete {
+      background: linear-gradient(135deg, #d32f2f, #c62828);
+      color: white;
+      border: 2px solid rgba(244, 67, 54, 0.6);
+      box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #c62828, #b71c1c);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(244, 67, 54, 0.6);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================
+// ANIMACIONES
+// ============================================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
