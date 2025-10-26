@@ -3,7 +3,7 @@ import SearchBar from "../../components/search-bar/search-bar";
 import MovieCard from "../../components/movie-card/movie-card";
 import MovieModal from "../../components/movie-modal/movie-modal";
 import servicioPeliculas from "../../services/peliculas.servicio";
-import servicioFavoritos from "../../services/favoritos.servicio.ts";
+import servicioFavoritos from "../../services/favoritos.servicio";
 import type { Movie, MovieFavorite, Genre } from "../../types/movies.types";
 import "./peliculas.scss";
 
