@@ -4,20 +4,24 @@ import type { Movie, MovieListResponse, MovieDetails, PexelsVideo } from "../typ
 const API_BASE_URL = "https://airfilms-server.onrender.com/api";
 
 /**
- * Servicio para manejar operaciones con películas.
- * Conecta con el backend que consume TMDB y Pexels.
+ * Servicio para manejar operaciones con películas de TMDB.
  */
 export const servicioPeliculas = {
   /**
-   * Obtiene películas populares con paginación.
+   * Obtiene películas populares de TMDB.
    * GET /api/movies/popular?page={page}
    */
   obtenerPopulares: async (page: number = 1): Promise<MovieListResponse> => {
     try {
-      const respuesta = await axios.get(`${API_BASE_URL}/movies/popular`, {
+      const response = await axios.get(`${API_BASE_URL}/movies/popular`, {
         params: { page }
       });
-      return respuesta.data;
+      return {
+        page: response.data.page,
+        results: response.data.results,
+        totalPages: response.data.total_pages,
+        totalResults: response.data.total_results || 0
+      };
     } catch (error: any) {
       console.error("Error al obtener películas populares:", error);
       throw new Error(
@@ -27,35 +31,25 @@ export const servicioPeliculas = {
   },
 
   /**
-   * Busca películas por nombre.
-   * GET /api/movies/search?name={query}
+   * Busca películas por género de TMDB.
+   * GET /api/movies/genre?genre={genre}&page={page}
    */
-  buscarPorNombre: async (query: string): Promise<MovieListResponse> => {
+  buscarPorGenero: async (genreId: string, page: number = 1): Promise<MovieListResponse> => {
     try {
-      const respuesta = await axios.get(`${API_BASE_URL}/movies/search`, {
-        params: { name: query }
+      const response = await axios.get(`${API_BASE_URL}/movies/genre`, {
+        params: { 
+          genre: genreId,
+          page 
+        }
       });
-      return respuesta.data;
+      return {
+        page: response.data.page,
+        results: response.data.results,
+        totalPages: response.data.total_pages,
+        totalResults: response.data.total_results || 0
+      };
     } catch (error: any) {
-      console.error("Error al buscar películas:", error);
-      throw new Error(
-        error.response?.data?.error || "Error al buscar películas"
-      );
-    }
-  },
-
-  /**
-   * Busca películas por género.
-   * GET /api/movies/genre?genre={genreId}
-   */
-  buscarPorGenero: async (genreId: string): Promise<MovieListResponse> => {
-    try {
-      const respuesta = await axios.get(`${API_BASE_URL}/movies/genre`, {
-        params: { genre: genreId }
-      });
-      return respuesta.data;
-    } catch (error: any) {
-      console.error("Error al buscar películas por género:", error);
+      console.error("Error al buscar por género:", error);
       throw new Error(
         error.response?.data?.error || "Error al buscar películas por género"
       );
@@ -64,15 +58,38 @@ export const servicioPeliculas = {
 
   /**
    * Obtiene detalles completos de una película.
-   * GET /api/movies/details?id={movieId}
-   * Incluye información del video de Pexels relacionado.
+   * GET /api/movies/details?id={id}
    */
   obtenerDetalles: async (movieId: number): Promise<MovieDetails> => {
     try {
-      const respuesta = await axios.get(`${API_BASE_URL}/movies/details`, {
+      const response = await axios.get(`${API_BASE_URL}/movies/details`, {
         params: { id: movieId }
       });
-      return respuesta.data;
+      
+      const data = response.data;
+      
+      // ✅ MAPEAR CORRECTAMENTE los datos del backend
+      return {
+        id: data.id,
+        title: data.title,
+        overview: data.overview,
+        releaseDate: data.releaseDate,
+        poster: data.poster,
+        backdrop: data.poster, // Usar poster como backdrop
+        voteAverage: 0, // Tu backend no devuelve esto
+        voteCount: 0, // Tu backend no devuelve esto
+        runtime: data.runtime,
+        // ✅ MAPEAR géneros correctamente
+        genres: data.genres.map((name: string, index: number) => ({ 
+          id: index, 
+          name 
+        })),
+        status: data.status,
+        // ✅ CUIDADO: Tu backend devuelve "original_language"
+        originalLanguage: data.original_language || "en",
+        videoId: data.videoId,
+        videoThumbnail: data.videoThumbnail
+      };
     } catch (error: any) {
       console.error("Error al obtener detalles de película:", error);
       throw new Error(
@@ -82,16 +99,44 @@ export const servicioPeliculas = {
   },
 
   /**
-   * Obtiene el video completo de Pexels.
-   * GET /api/movies/get-video?id={videoId}
+   * Busca películas por nombre.
+   * GET /api/movies/search?name={name}&page={page}
    */
-  obtenerVideo: async (videoId: number): Promise<PexelsVideo> => {
+  buscarPorNombre: async (query: string, page: number = 1): Promise<MovieListResponse> => {
     try {
-      const respuesta = await axios.get(`${API_BASE_URL}/movies/get-video`, {
+      const response = await axios.get(`${API_BASE_URL}/movies/search`, {
+        params: { 
+          name: query,
+          page 
+        }
+      });
+      return {
+        page: response.data.page,
+        results: response.data.results,
+        totalPages: response.data.total_pages,
+        totalResults: response.data.total_results || 0
+      };
+    } catch (error: any) {
+      console.error("Error al buscar películas:", error);
+      throw new Error(
+        error.response?.data?.error || "Error al buscar películas"
+      );
+    }
+  },
+
+  /**
+   * Obtiene un video de Pexels por ID.
+   * GET /api/movies/get-video?id={id}
+   */
+  obtenerVideo: async (videoId: string | number): Promise<PexelsVideo> => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/movies/get-video`, {
         params: { id: videoId }
       });
       
-      const data = respuesta.data;
+      const data = response.data;
+      
+      // ✅ MAPEAR correctamente la respuesta de Pexels
       return {
         id: data.id,
         width: data.width,
@@ -117,10 +162,10 @@ export const servicioPeliculas = {
       }
       
       throw new Error(
-        error.response?.data?.error || "Error al cargar el video"
+        error.response?.data?.error || "Error al cargar video"
       );
     }
-  }
+  },
 };
 
 export default servicioPeliculas;

@@ -192,7 +192,7 @@ const MovieModal: React.FC<MovieModalProps> = ({
                 <span className="movie-modal__runtime">{details.runtime} min</span>
                 <span className="movie-modal__divider">•</span>
                 <span className="movie-modal__language">
-                  {details.originalLanguage.toUpperCase()}
+                  {(details.originalLanguage || "en").toUpperCase()}
                 </span>
               </div>
 
