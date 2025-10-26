@@ -133,14 +133,23 @@ const PeliculasPage: React.FC = () => {
       const isFav = servicioFavoritos.esFavorito(movieId, favorites);
 
       if (isFav) {
+        // Eliminar de favoritos
         await servicioFavoritos.eliminarFavorito(movieId);
         setFavorites(favorites.filter(fav => fav.movieId !== movieId));
       } else {
+        // Agregar a favoritos
         const newFavorite = await servicioFavoritos.agregarFavorito(movieId);
         setFavorites([...favorites, newFavorite]);
       }
     } catch (err: any) {
-      alert(err.message);
+      console.error("Error al manejar favorito:", err);
+      alert(err.message || "Error al actualizar favoritos");
+      
+      // Si es error de sesión, recargar favoritos
+      if (err.message.includes("Sesión expirada")) {
+        setIsAuthenticated(false);
+        setFavorites([]);
+      }
     }
   };
 

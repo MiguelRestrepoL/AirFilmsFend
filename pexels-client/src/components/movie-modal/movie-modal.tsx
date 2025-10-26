@@ -37,21 +37,21 @@ const MovieModal: React.FC<MovieModalProps> = ({
         const data = await servicioPeliculas.obtenerDetalles(movieId);
         setDetails(data);
 
-        // Intentar cargar video de Pexels relacionado
-        // Nota: El backend busca automáticamente un video relacionado
-        setIsLoadingVideo(true);
-        try {
-          // Usamos el ID de la película para buscar un video relacionado
-          // Tu backend debería manejar esto internamente
-          const videoData = await servicioPeliculas.obtenerVideo(movieId);
-          setVideo(videoData);
-        } catch (err) {
-          console.warn("No se encontró video para esta película:", err);
-          // No mostrar error, simplemente no hay video
-        } finally {
-          setIsLoadingVideo(false);
+        // ✅ CORRECCIÓN: Usar videoId de los detalles, NO el movieId
+        if (data.videoId) {
+          setIsLoadingVideo(true);
+          try {
+            const videoData = await servicioPeliculas.obtenerVideo(data.videoId);
+            setVideo(videoData);
+          } catch (err) {
+            console.warn("No se pudo cargar el video de Pexels:", err);
+            // No es un error crítico, simplemente no hay video
+          } finally {
+            setIsLoadingVideo(false);
+          }
         }
       } catch (err: any) {
+        console.error("Error al cargar detalles:", err);
         setError(err.message || "Error al cargar la película");
       } finally {
         setIsLoadingDetails(false);
@@ -118,6 +118,9 @@ const MovieModal: React.FC<MovieModalProps> = ({
         {error && (
           <div className="movie-modal__error">
             <p>{error}</p>
+            <button onClick={onClose} className="movie-modal__error-btn">
+              Cerrar
+            </button>
           </div>
         )}
 
@@ -139,15 +142,7 @@ const MovieModal: React.FC<MovieModalProps> = ({
             ) : isLoadingVideo ? (
               <div className="movie-modal__video-loading">
                 <div className="movie-modal__spinner"></div>
-                <p>Buscando video...</p>
-              </div>
-            ) : details.backdrop ? (
-              <div className="movie-modal__poster-section">
-                <img 
-                  src={details.backdrop} 
-                  alt={details.title}
-                  className="movie-modal__backdrop" 
-                />
+                <p>Cargando video...</p>
               </div>
             ) : details.poster ? (
               <div className="movie-modal__poster-section">
@@ -182,10 +177,14 @@ const MovieModal: React.FC<MovieModalProps> = ({
               </div>
 
               <div className="movie-modal__meta">
-                <span className="movie-modal__rating">
-                  ⭐ {details.voteAverage.toFixed(1)}
-                </span>
-                <span className="movie-modal__divider">•</span>
+                {details.voteAverage > 0 && (
+                  <>
+                    <span className="movie-modal__rating">
+                      ⭐ {details.voteAverage.toFixed(1)}
+                    </span>
+                    <span className="movie-modal__divider">•</span>
+                  </>
+                )}
                 <span className="movie-modal__year">
                   {new Date(details.releaseDate).getFullYear()}
                 </span>
@@ -227,10 +226,12 @@ const MovieModal: React.FC<MovieModalProps> = ({
                     })}
                   </span>
                 </div>
-                <div className="movie-modal__info-item">
-                  <span className="movie-modal__label">Votos</span>
-                  <span className="movie-modal__value">{details.voteCount.toLocaleString()}</span>
-                </div>
+                {details.voteCount > 0 && (
+                  <div className="movie-modal__info-item">
+                    <span className="movie-modal__label">Votos</span>
+                    <span className="movie-modal__value">{details.voteCount.toLocaleString()}</span>
+                  </div>
+                )}
               </div>
             </div>
           </>

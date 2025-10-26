@@ -4,24 +4,20 @@ import type { Movie, MovieListResponse, MovieDetails, PexelsVideo } from "../typ
 const API_BASE_URL = "https://airfilms-server.onrender.com/api";
 
 /**
- * Servicio para manejar operaciones con películas de TMDB.
+ * Servicio para manejar operaciones con películas.
+ * Conecta con el backend que consume TMDB y Pexels.
  */
 export const servicioPeliculas = {
   /**
-   * Obtiene películas populares de TMDB.
+   * Obtiene películas populares con paginación.
    * GET /api/movies/popular?page={page}
    */
   obtenerPopulares: async (page: number = 1): Promise<MovieListResponse> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/movies/popular`, {
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/popular`, {
         params: { page }
       });
-      return {
-        page: response.data.page,
-        results: response.data.results,
-        totalPages: response.data.total_pages,
-        totalResults: response.data.total_results || 0
-      };
+      return respuesta.data;
     } catch (error: any) {
       console.error("Error al obtener películas populares:", error);
       throw new Error(
@@ -31,87 +27,15 @@ export const servicioPeliculas = {
   },
 
   /**
-   * Busca películas por género de TMDB.
-   * GET /api/movies/genre?genre={genre}&page={page}
-   */
-  buscarPorGenero: async (genreId: string, page: number = 1): Promise<MovieListResponse> => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/movies/genre`, {
-        params: { 
-          genre: genreId,  // ✅ Backend espera "genre"
-          page 
-        }
-      });
-      return {
-        page: response.data.page,
-        results: response.data.results,
-        totalPages: response.data.total_pages,
-        totalResults: response.data.total_results || 0
-      };
-    } catch (error: any) {
-      console.error("Error al buscar por género:", error);
-      throw new Error(
-        error.response?.data?.error || "Error al buscar películas por género"
-      );
-    }
-  },
-
-  /**
-   * Obtiene detalles completos de una película.
-   * GET /api/movies/details?id={id}
-   */
-  obtenerDetalles: async (movieId: number): Promise<MovieDetails> => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/movies/details`, {
-        params: { id: movieId }  // ✅ Backend espera "id"
-      });
-      
-      const data = response.data;
-      return {
-        id: data.id,
-        title: data.title,
-        overview: data.overview,
-        releaseDate: data.releaseDate,
-        poster: data.poster,
-        backdrop: data.poster, // Usar poster como backdrop si no hay
-        voteAverage: 0, // No viene en tu backend
-        voteCount: 0, // No viene en tu backend
-        runtime: data.runtime,
-        genres: data.genres.map((name: string, index: number) => ({ 
-          id: index, 
-          name 
-        })),
-        status: data.status,
-        originalLanguage: data.original_language,
-        videoId: data.videoId, // ✅ Tu backend sí devuelve esto
-        videoThumbnail: data.videoThumbnail
-      };
-    } catch (error: any) {
-      console.error("Error al obtener detalles de película:", error);
-      throw new Error(
-        error.response?.data?.error || "Error al cargar detalles de la película"
-      );
-    }
-  },
-
-  /**
    * Busca películas por nombre.
-   * GET /api/movies/search?name={name}&page={page}
+   * GET /api/movies/search?name={query}
    */
-  buscarPorNombre: async (query: string, page: number = 1): Promise<MovieListResponse> => {
+  buscarPorNombre: async (query: string): Promise<MovieListResponse> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/movies/search`, {
-        params: { 
-          name: query,  // ✅ Backend espera "name"
-          page 
-        }
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/search`, {
+        params: { name: query }
       });
-      return {
-        page: response.data.page,
-        results: response.data.results,
-        totalPages: response.data.total_pages,
-        totalResults: response.data.total_results || 0
-      };
+      return respuesta.data;
     } catch (error: any) {
       console.error("Error al buscar películas:", error);
       throw new Error(
@@ -121,16 +45,53 @@ export const servicioPeliculas = {
   },
 
   /**
-   * Obtiene un video de Pexels por ID.
-   * GET /api/movies/get-video?id={id}
+   * Busca películas por género.
+   * GET /api/movies/genre?genre={genreId}
    */
-  obtenerVideo: async (videoId: string | number): Promise<PexelsVideo> => {
+  buscarPorGenero: async (genreId: string): Promise<MovieListResponse> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/movies/get-video`, {
-        params: { id: videoId }  // ✅ Backend espera "id"
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/genre`, {
+        params: { genre: genreId }
+      });
+      return respuesta.data;
+    } catch (error: any) {
+      console.error("Error al buscar películas por género:", error);
+      throw new Error(
+        error.response?.data?.error || "Error al buscar películas por género"
+      );
+    }
+  },
+
+  /**
+   * Obtiene detalles completos de una película.
+   * GET /api/movies/details?id={movieId}
+   * Incluye información del video de Pexels relacionado.
+   */
+  obtenerDetalles: async (movieId: number): Promise<MovieDetails> => {
+    try {
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/details`, {
+        params: { id: movieId }
+      });
+      return respuesta.data;
+    } catch (error: any) {
+      console.error("Error al obtener detalles de película:", error);
+      throw new Error(
+        error.response?.data?.error || "Error al cargar detalles de la película"
+      );
+    }
+  },
+
+  /**
+   * Obtiene el video completo de Pexels.
+   * GET /api/movies/get-video?id={videoId}
+   */
+  obtenerVideo: async (videoId: number): Promise<PexelsVideo> => {
+    try {
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/get-video`, {
+        params: { id: videoId }
       });
       
-      const data = response.data;
+      const data = respuesta.data;
       return {
         id: data.id,
         width: data.width,
@@ -138,22 +99,28 @@ export const servicioPeliculas = {
         duration: data.duration,
         image: data.image,
         url: data.url,
-        videoFiles: data.video_files.map((file: any) => ({
+        videoFiles: data.video_files?.map((file: any) => ({
           id: file.id,
           quality: file.quality,
           fileType: file.file_type,
           width: file.width,
           height: file.height,
           link: file.link
-        }))
+        })) || []
       };
     } catch (error: any) {
       console.error("Error al obtener video:", error);
+      
+      // Si es 404, el video no existe (no es error crítico)
+      if (error.response?.status === 404) {
+        throw new Error("Video no encontrado");
+      }
+      
       throw new Error(
-        error.response?.data?.error || "Error al cargar video"
+        error.response?.data?.error || "Error al cargar el video"
       );
     }
-  },
+  }
 };
 
 export default servicioPeliculas;

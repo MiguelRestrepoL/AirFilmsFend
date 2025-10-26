@@ -3,31 +3,21 @@ import type { MovieFavorite } from "../types/movies.types";
 
 const API_BASE_URL = "https://airfilms-server.onrender.com/api";
 
-interface AddFavoriteResponse {
-  success: boolean;
-  favorite: MovieFavorite;
-  message?: string;
-}
-
-interface DeleteFavoriteResponse {
-  success: boolean;
-  message?: string;
-}
-
-interface GetFavoritesResponse {
-  success: boolean;
-  favorites: MovieFavorite[];
-  message?: string;
-}
-
 /**
  * Servicio para manejar favoritos de películas.
+ * Requiere autenticación (token JWT).
  */
 export const servicioFavoritos = {
+  /**
+   * Obtiene el token del localStorage
+   */
   obtenerToken: (): string | null => {
     return localStorage.getItem("airfilms_token");
   },
 
+  /**
+   * Obtiene headers con autenticación
+   */
   obtenerHeaders: () => {
     const token = servicioFavoritos.obtenerToken();
     if (!token) {
@@ -40,98 +30,20 @@ export const servicioFavoritos = {
   },
 
   /**
-   * Agrega una película a favoritos.
-   * POST /api/movies/add-favorite
-   * Body: { movieId, movieName, movieURL }
-   */
-  agregarFavorito: async (movieId: number, movieName?: string, movieURL?: string): Promise<MovieFavorite> => {
-    try {
-      const headers = servicioFavoritos.obtenerHeaders();
-      
-      const response = await axios.post<AddFavoriteResponse>(
-        `${API_BASE_URL}/movies/add-favorite`,
-        { 
-          movieId,
-          movieName: movieName || `Película ${movieId}`,
-          movieURL: movieURL || ""
-        },
-        { headers }
-      );
-
-      if (response.data.success && response.data.favorite) {
-        return response.data.favorite;
-      }
-
-      throw new Error(response.data.message || "Error al agregar favorito");
-    } catch (error: any) {
-      console.error("Error al agregar favorito:", error);
-      
-      if (error.response?.status === 401) {
-        throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
-      }
-      
-      throw new Error(
-        error.response?.data?.message || "Error al agregar película a favoritos"
-      );
-    }
-  },
-
-  /**
-   * Elimina una película de favoritos.
-   * DELETE /api/movies/delete-favorite
-   * Body: { movieId }
-   */
-  eliminarFavorito: async (movieId: number): Promise<void> => {
-    try {
-      const headers = servicioFavoritos.obtenerHeaders();
-      
-      const response = await axios.delete<DeleteFavoriteResponse>(
-        `${API_BASE_URL}/movies/delete-favorite`,
-        {
-          data: { movieId },  // ✅ Enviar en el body, no query params
-          headers,
-        }
-      );
-
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Error al eliminar favorito");
-      }
-    } catch (error: any) {
-      console.error("Error al eliminar favorito:", error);
-      
-      if (error.response?.status === 401) {
-        throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
-      }
-      
-      throw new Error(
-        error.response?.data?.message || "Error al eliminar película de favoritos"
-      );
-    }
-  },
-
-  /**
    * Obtiene todos los favoritos del usuario autenticado.
    * GET /api/movies/get-favorites
+   * Requiere: Authorization Bearer token
    */
   obtenerFavoritos: async (): Promise<MovieFavorite[]> => {
     try {
       const headers = servicioFavoritos.obtenerHeaders();
       
-      const response = await axios.get<GetFavoritesResponse>(
-        `${API_BASE_URL}/movies/get-favorites`,
-        { headers }
-      );
-
-      if (response.data.success) {
-        return response.data.favorites || [];
-      }
-
-      // Si no hay favoritos, devolver array vacío (no error)
-      if (response.status === 404) {
-        return [];
-      }
-
-      return [];
+      const respuesta = await axios.get(`${API_BASE_URL}/movies/get-favorites`, {
+        headers
+      });
+      
+      // Tu backend devuelve un array directo
+      return Array.isArray(respuesta.data) ? respuesta.data : [];
     } catch (error: any) {
       console.error("Error al obtener favoritos:", error);
       
@@ -140,6 +52,7 @@ export const servicioFavoritos = {
         return [];
       }
       
+      // Si es 401, sesión expirada
       if (error.response?.status === 401) {
         localStorage.removeItem("airfilms_token");
         localStorage.removeItem("airfilms_usuario");
@@ -147,14 +60,82 @@ export const servicioFavoritos = {
       }
       
       throw new Error(
-        error.response?.data?.message || "Error al cargar favoritos"
+        error.response?.data?.error || "Error al cargar favoritos"
       );
     }
   },
 
-  esFavorito: (movieId: number, favorites: MovieFavorite[]): boolean => {
-    return favorites.some((fav) => fav.movieId === movieId);
+  /**
+   * Agrega una película a favoritos.
+   * POST /api/movies/add-favorite
+   * Body: { movieId: number }
+   * Requiere: Authorization Bearer token
+   */
+  agregarFavorito: async (movieId: number): Promise<MovieFavorite> => {
+    try {
+      const headers = servicioFavoritos.obtenerHeaders();
+      
+      const respuesta = await axios.post(
+        `${API_BASE_URL}/movies/add-favorite`,
+        { movieId }, // ✅ Solo enviar movieId según tu backend
+        { headers }
+      );
+      
+      return respuesta.data;
+    } catch (error: any) {
+      console.error("Error al agregar favorito:", error);
+      
+      if (error.response?.status === 401) {
+        throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
+      }
+      
+      // Manejar error de duplicado (si ya existe)
+      if (error.response?.status === 409) {
+        throw new Error("Esta película ya está en tus favoritos");
+      }
+      
+      throw new Error(
+        error.response?.data?.error || "Error al agregar a favoritos"
+      );
+    }
   },
+
+  /**
+   * Elimina una película de favoritos.
+   * DELETE /api/movies/delete-favorite?movieId={movieId}
+   * Requiere: Authorization Bearer token
+   */
+  eliminarFavorito: async (movieId: number): Promise<boolean> => {
+    try {
+      const headers = servicioFavoritos.obtenerHeaders();
+      
+      // ✅ CORRECCIÓN: Usar query params según tu backend
+      await axios.delete(`${API_BASE_URL}/movies/delete-favorite`, {
+        params: { movieId },
+        headers
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error("Error al eliminar favorito:", error);
+      
+      if (error.response?.status === 401) {
+        throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
+      }
+      
+      throw new Error(
+        error.response?.data?.error || "Error al eliminar de favoritos"
+      );
+    }
+  },
+
+  /**
+   * Verifica si una película está en favoritos.
+   * (Método helper del cliente)
+   */
+  esFavorito: (movieId: number, favoritos: MovieFavorite[]): boolean => {
+    return favoritos.some(fav => fav.movieId === movieId);
+  }
 };
 
 export default servicioFavoritos;

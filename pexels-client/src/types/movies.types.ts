@@ -19,7 +19,7 @@ export interface MovieListResponse {
 }
 
 /**
- * Detalles completos de una película
+ * Detalles completos de una película (respuesta de /api/movies/details)
  */
 export interface MovieDetails {
   id: number;
@@ -27,19 +27,19 @@ export interface MovieDetails {
   overview: string;
   releaseDate: string;
   poster: string | null;
-  backdrop: string | null;
+  backdrop?: string | null;
   voteAverage: number;
   voteCount: number;
   runtime: number;
   genres: Array<{ id: number; name: string }>;
   status: string;
   originalLanguage: string;
-  videoId?: number;  // ID del video de Pexels
-  videoThumbnail?: string;  // Thumbnail del video
+  videoId?: number;  // ID del video de Pexels (si existe)
+  videoThumbnail?: string;  // Thumbnail del video de Pexels
 }
 
 /**
- * Video de Pexels
+ * Video de Pexels (respuesta de /api/movies/get-video)
  */
 export interface PexelsVideo {
   id: number;
@@ -60,13 +60,12 @@ export interface PexelsVideo {
 
 /**
  * Favorito de película (estructura de Supabase)
+ * Respuesta del backend: { id, userId, movieId, createdAt }
  */
 export interface MovieFavorite {
   id?: string;
   userId: string;
   movieId: number;
-  movieName?: string;
-  posterURL?: string;
   createdAt?: string;
 }
 
