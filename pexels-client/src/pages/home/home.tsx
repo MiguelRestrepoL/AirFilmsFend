@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ResultadoBusquedaVideo } from "../../types/video.types";
+import type { ResultadoBusquedaVideo } from "../../types/movies.types";
 import "./home.scss";
 
 /**

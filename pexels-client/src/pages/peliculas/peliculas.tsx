@@ -1,115 +1,182 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "../../components/search-bar/search-bar";
-import CategoryFilter from "../../components/category-filter/category-filter";
-import VideoCard from "../../components/video-card/video-card";
-import VideoModal from "../../components/video-modal/video-modal";
-import type { ResultadoBusquedaVideo, Categoria } from "../../types/video.types";
+import MovieCard from "../../components/movie-card/movie-card";
+import MovieModal from "../../components/movie-modal/movie-modal.ts";
+import servicioPeliculas from "../../services/peliculas.servicio";
+import servicioFavoritos from "../../services/favoritos.servicio.ts";
+import type { Movie, MovieFavorite, Genre } from "../../types/movies.types";
 import "./peliculas.scss";
 
 /**
- * Lista de categorías predefinidas para filtrado rápido.
+ * Géneros de TMDB para filtrado
  */
-const CATEGORIAS: Categoria[] = [
-  { id: "1", nombre: "Acción", consulta: "action" },
-  { id: "2", nombre: "Comedia", consulta: "comedy" },
-  { id: "3", nombre: "Drama", consulta: "drama" },
-  { id: "4", nombre: "Ciencia Ficción", consulta: "science fiction" },
-  { id: "5", nombre: "Documentales", consulta: "documentary" },
-  { id: "6", nombre: "Naturaleza", consulta: "nature" },
+const GENRES: Genre[] = [
+  { id: "28", name: "Acción", tmdbId: "28" },
+  { id: "35", name: "Comedia", tmdbId: "35" },
+  { id: "18", name: "Drama", tmdbId: "18" },
+  { id: "878", name: "Ciencia Ficción", tmdbId: "878" },
+  { id: "27", name: "Terror", tmdbId: "27" },
+  { id: "10749", name: "Romance", tmdbId: "10749" },
+  { id: "16", name: "Animación", tmdbId: "16" },
 ];
 
 /**
- * Página principal de películas.
- * Permite buscar videos por término, filtrar por categoría y ver detalles.
- * 
- * @component
- * @returns {JSX.Element} Vista de películas con búsqueda y filtros
- * 
- * @remarks
- * Implementa las dos funcionalidades principales del reto:
- * 1. Search Videos - Búsqueda por término
- * 2. Get Video by ID - Obtener video específico al hacer clic
+ * Página principal de películas con TMDB.
+ * Funcionalidades:
+ * - Búsqueda por nombre
+ * - Filtrado por género
+ * - Películas populares
+ * - Sistema de favoritos (solo usuarios autenticados)
  */
-const MoviePage: React.FC = () => {
-  const [videos, setVideos] = useState<ResultadoBusquedaVideo[]>([]);
-  const [videoSeleccionado, setVideoSeleccionado] = useState<number | null>(null);
-  const [estaCargando, setEstaCargando] = useState(false);
+const PeliculasPage: React.FC = () => {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [categoriaActiva, setCategoriaActiva] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<string>("popular");
+  const [favorites, setFavorites] = useState<MovieFavorite[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Verificar autenticación
+  useEffect(() => {
+    const token = localStorage.getItem("airfilms_token");
+    setIsAuthenticated(!!token);
+
+    if (token) {
+      loadFavorites();
+    }
+  }, []);
 
   /**
-   * Busca videos en el backend por término de búsqueda.
-   * Consume el endpoint: GET /videos/search?query={consulta}
-   * 
-   * @param {string} consulta - Término a buscar (ej: "naturaleza", "ocean")
+   * Carga los favoritos del usuario autenticado
    */
-  const buscarVideos = async (consulta: string) => {
+  const loadFavorites = async () => {
     try {
-      setEstaCargando(true);
-      setError(null);
-      
-      const url = `${import.meta.env.VITE_API_LOCAL_URL}/videos/search?query=${encodeURIComponent(consulta)}`;
-      const respuesta = await fetch(url);
-      
-      if (!respuesta.ok) {
-        throw new Error(`Estado de respuesta: ${respuesta.status}`);
-      }
-      
-      const datos = await respuesta.json();
-      setVideos(datos);
-      setCategoriaActiva(consulta);
-    } catch (err: any) {
-      console.error(err);
-      setError("Error al buscar videos. Intenta nuevamente.");
-    } finally {
-      setEstaCargando(false);
+      const data = await servicioFavoritos.obtenerFavoritos();
+      setFavorites(data);
+    } catch (err) {
+      console.error("Error al cargar favoritos:", err);
     }
   };
 
   /**
-   * Maneja el cambio de categoría.
-   * 
-   * @param {string} consultaCategoria - Consulta de la categoría seleccionada
+   * Carga películas populares al iniciar
    */
-  const manejarCambioCategoria = (consultaCategoria: string) => {
-    buscarVideos(consultaCategoria);
-  };
-
-  /**
-   * Abre el modal con el video seleccionado.
-   * El modal internamente consumirá: GET /videos/get?id={videoId}
-   * 
-   * @param {number} videoId - ID del video a mostrar
-   */
-  const abrirModal = (videoId: number) => {
-    setVideoSeleccionado(videoId);
-  };
-
-  /**
-   * Cierra el modal de video.
-   */
-  const cerrarModal = () => {
-    setVideoSeleccionado(null);
-  };
-
-  // Cargar videos populares al montar el componente
   useEffect(() => {
-    buscarVideos("popular");
+    loadPopularMovies();
   }, []);
+
+  /**
+   * Busca películas por nombre
+   */
+  const searchMovies = async (query: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await servicioPeliculas.buscarPorNombre(query);
+      setMovies(response.results);
+      setActiveFilter(query);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Carga películas populares
+   */
+  const loadPopularMovies = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await servicioPeliculas.obtenerPopulares(1);
+      setMovies(response.results);
+      setActiveFilter("popular");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Filtra películas por género
+   */
+  const filterByGenre = async (genreId: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await servicioPeliculas.buscarPorGenero(genreId);
+      setMovies(response.results);
+      setActiveFilter(genreId);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Alterna el estado de favorito de una película
+   */
+  const toggleFavorite = async (movieId: number) => {
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para agregar favoritos");
+      return;
+    }
+
+    try {
+      const isFav = servicioFavoritos.esFavorito(movieId, favorites);
+
+      if (isFav) {
+        await servicioFavoritos.eliminarFavorito(movieId);
+        setFavorites(favorites.filter(fav => fav.movieId !== movieId));
+      } else {
+        const newFavorite = await servicioFavoritos.agregarFavorito(movieId);
+        setFavorites([...favorites, newFavorite]);
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  /**
+   * Verifica si una película está en favoritos
+   */
+  const isFavorite = (movieId: number): boolean => {
+    return servicioFavoritos.esFavorito(movieId, favorites);
+  };
 
   return (
     <div className="movie-page">
       <div className="movie-page__header">
         <h1 className="movie-page__title">Películas</h1>
-        <SearchBar alBuscar={buscarVideos} />
+        <SearchBar alBuscar={searchMovies} marcadorPosicion="Buscar películas..." />
       </div>
 
       <div className="movie-page__container">
-        <CategoryFilter
-          categorias={CATEGORIAS}
-          categoriaActiva={categoriaActiva}
-          alCambiarCategoria={manejarCambioCategoria}
-        />
+        {/* Filtros de género */}
+        <div className="movie-page__filters">
+          <button
+            className={`movie-page__filter ${activeFilter === "popular" ? "movie-page__filter--active" : ""}`}
+            onClick={loadPopularMovies}
+          >
+            Populares
+          </button>
+          {GENRES.map((genre) => (
+            <button
+              key={genre.id}
+              className={`movie-page__filter ${activeFilter === genre.tmdbId ? "movie-page__filter--active" : ""}`}
+              onClick={() => filterByGenre(genre.tmdbId)}
+            >
+              {genre.name}
+            </button>
+          ))}
+        </div>
 
         {error && (
           <div className="movie-page__error">
@@ -117,23 +184,26 @@ const MoviePage: React.FC = () => {
           </div>
         )}
 
-        {estaCargando ? (
+        {isLoading ? (
           <div className="movie-page__loading">
             <div className="movie-page__spinner"></div>
-            <p>Cargando videos...</p>
+            <p>Cargando películas...</p>
           </div>
         ) : (
           <div className="movie-page__grid">
-            {videos.length === 0 ? (
+            {movies.length === 0 ? (
               <div className="movie-page__empty">
-                <p>No se encontraron videos. Intenta otra búsqueda.</p>
+                <p>No se encontraron películas.</p>
               </div>
             ) : (
-              videos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  video={video}
-                  alHacerClick={() => abrirModal(video.id)}
+              movies.map((movie) => (
+                <MovieCard
+                  key={movie.id}
+                  movie={movie}
+                  isFavorite={isFavorite(movie.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onClick={() => setSelectedMovieId(movie.id)}
+                  showFavoriteButton={isAuthenticated}
                 />
               ))
             )}
@@ -141,14 +211,17 @@ const MoviePage: React.FC = () => {
         )}
       </div>
 
-      {videoSeleccionado && (
-        <VideoModal
-          videoId={videoSeleccionado}
-          alCerrar={cerrarModal}
+      {selectedMovieId && (
+        <MovieModal
+          movieId={selectedMovieId}
+          onClose={() => setSelectedMovieId(null)}
+          isFavorite={isFavorite(selectedMovieId)}
+          onToggleFavorite={toggleFavorite}
+          showFavoriteButton={isAuthenticated}
         />
       )}
     </div>
   );
 };
 
-export default MoviePage;
+export default PeliculasPage;

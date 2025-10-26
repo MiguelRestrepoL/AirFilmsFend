@@ -1,5 +1,5 @@
 import React from "react";
-import type { Categoria } from "../../types/video.types";
+import type { Categoria } from "../../types/movies.types";
 import "./category-filter.scss";
 
 /**

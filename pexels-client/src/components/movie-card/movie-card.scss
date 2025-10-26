@@ -1,0 +1,158 @@
+.movie-card {
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1a1a;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(255, 87, 34, 0.3);
+
+    .movie-card__overlay {
+      opacity: 1;
+    }
+
+    .movie-card__favorite {
+      opacity: 1;
+    }
+  }
+
+  &__image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 150%; // Aspect ratio para póster de película (2:3)
+    overflow: hidden;
+    background: #2a2a2a;
+  }
+
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__no-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #666;
+
+    svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    span {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &__play-icon {
+    width: 60px;
+    height: 60px;
+    color: #ff5722;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+
+  &__favorite {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: white;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: rgba(255, 87, 34, 0.9);
+      transform: scale(1.1);
+    }
+
+    &--active {
+      opacity: 1;
+      background: rgba(255, 87, 34, 0.9);
+      color: #ff5722;
+
+      &:hover {
+        background: rgba(255, 87, 34, 1);
+      }
+    }
+  }
+
+  &__info {
+    padding: 1rem;
+  }
+
+  &__title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__year {
+    color: #999;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .movie-card {
+    &__favorite {
+      opacity: 1; // Siempre visible en móvil
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+}
