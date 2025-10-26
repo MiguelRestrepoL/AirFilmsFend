@@ -34,6 +34,8 @@ export interface MovieDetails {
   genres: Array<{ id: number; name: string }>;
   status: string;
   originalLanguage: string;
+  videoId?: number;  // ID del video de Pexels
+  videoThumbnail?: string;  // Thumbnail del video
 }
 
 /**
@@ -57,13 +59,15 @@ export interface PexelsVideo {
 }
 
 /**
- * Favorito de película
+ * Favorito de película (estructura de Supabase)
  */
 export interface MovieFavorite {
-  id: string;
+  id?: string;
   userId: string;
   movieId: number;
-  createdAt: string;
+  movieName?: string;
+  posterURL?: string;
+  createdAt?: string;
 }
 
 /**

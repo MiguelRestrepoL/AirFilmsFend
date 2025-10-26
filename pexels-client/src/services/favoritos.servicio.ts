@@ -6,17 +6,18 @@ const API_BASE_URL = "https://airfilms-server.onrender.com/api";
 interface AddFavoriteResponse {
   success: boolean;
   favorite: MovieFavorite;
-  message: string;
+  message?: string;
 }
 
 interface DeleteFavoriteResponse {
   success: boolean;
-  message: string;
+  message?: string;
 }
 
 interface GetFavoritesResponse {
   success: boolean;
   favorites: MovieFavorite[];
+  message?: string;
 }
 
 /**
@@ -38,13 +39,22 @@ export const servicioFavoritos = {
     };
   },
 
-  agregarFavorito: async (movieId: number): Promise<MovieFavorite> => {
+  /**
+   * Agrega una película a favoritos.
+   * POST /api/movies/add-favorite
+   * Body: { movieId, movieName, movieURL }
+   */
+  agregarFavorito: async (movieId: number, movieName?: string, movieURL?: string): Promise<MovieFavorite> => {
     try {
       const headers = servicioFavoritos.obtenerHeaders();
       
       const response = await axios.post<AddFavoriteResponse>(
         `${API_BASE_URL}/movies/add-favorite`,
-        { movieId },
+        { 
+          movieId,
+          movieName: movieName || `Película ${movieId}`,
+          movieURL: movieURL || ""
+        },
         { headers }
       );
 
@@ -66,6 +76,11 @@ export const servicioFavoritos = {
     }
   },
 
+  /**
+   * Elimina una película de favoritos.
+   * DELETE /api/movies/delete-favorite
+   * Body: { movieId }
+   */
   eliminarFavorito: async (movieId: number): Promise<void> => {
     try {
       const headers = servicioFavoritos.obtenerHeaders();
@@ -73,7 +88,7 @@ export const servicioFavoritos = {
       const response = await axios.delete<DeleteFavoriteResponse>(
         `${API_BASE_URL}/movies/delete-favorite`,
         {
-          params: { movieId },
+          data: { movieId },  // ✅ Enviar en el body, no query params
           headers,
         }
       );
@@ -94,6 +109,10 @@ export const servicioFavoritos = {
     }
   },
 
+  /**
+   * Obtiene todos los favoritos del usuario autenticado.
+   * GET /api/movies/get-favorites
+   */
   obtenerFavoritos: async (): Promise<MovieFavorite[]> => {
     try {
       const headers = servicioFavoritos.obtenerHeaders();
@@ -107,9 +126,19 @@ export const servicioFavoritos = {
         return response.data.favorites || [];
       }
 
+      // Si no hay favoritos, devolver array vacío (no error)
+      if (response.status === 404) {
+        return [];
+      }
+
       return [];
     } catch (error: any) {
       console.error("Error al obtener favoritos:", error);
+      
+      // Si es 404, no hay favoritos (no es error)
+      if (error.response?.status === 404) {
+        return [];
+      }
       
       if (error.response?.status === 401) {
         localStorage.removeItem("airfilms_token");
