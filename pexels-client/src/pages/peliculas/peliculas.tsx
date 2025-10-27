@@ -36,6 +36,7 @@ const PeliculasPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("popular");
   const [favorites, setFavorites] = useState<MovieFavorite[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showingFavorites, setShowingFavorites] = useState(false); // ✨ NUEVO
 
   // Verificar autenticación
   useEffect(() => {

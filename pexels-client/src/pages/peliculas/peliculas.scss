@@ -59,6 +59,9 @@
     transition: all 0.3s ease;
     white-space: nowrap;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       background: rgba(255, 87, 34, 0.2);
@@ -69,6 +72,35 @@
       background: linear-gradient(135deg, #ff5722, #ff7043);
       border-color: #ff5722;
       box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+    }
+
+    &--favorites {
+      background: rgba(255, 193, 7, 0.15);
+      border-color: rgba(255, 193, 7, 0.3);
+
+      &:hover {
+        background: rgba(255, 193, 7, 0.25);
+        border-color: #ffc107;
+      }
+
+      &.movie-page__filter--active {
+        background: linear-gradient(135deg, #ffc107, #ffb300);
+        border-color: #ffc107;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+
+        svg {
+          animation: starPulse 2s ease-in-out infinite;
+        }
+      }
+    }
+  }
+
+  @keyframes starPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
     }
   }
 
