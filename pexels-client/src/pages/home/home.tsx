@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ResultadoBusquedaVideo } from "../../types/movies.types";
+import servicioPeliculas from "../../services/peliculas.servicio";
+import type { Movie } from "../../types/movies.types";
 import "./home.scss";
 
 /**
@@ -16,8 +17,8 @@ const HomePage: React.FC = () => {
   const [estaAutenticado, setEstaAutenticado] = useState(false);
   const [estaCargando, setEstaCargando] = useState(true);
   const [usuario, setUsuario] = useState<any>(null);
-  const [videosDestacados, setVideosDestacados] = useState<ResultadoBusquedaVideo[]>([]);
-  const [videosRecomendados, setVideosRecomendados] = useState<ResultadoBusquedaVideo[]>([]);
+  const [peliculasDestacadas, setPeliculasDestacadas] = useState<Movie[]>([]);
+  const [peliculasRecomendadas, setPeliculasRecomendadas] = useState<Movie[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   /**
@@ -26,7 +27,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const verificarAutenticacion = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("airfilms_token"); // ← Cambiado a airfilms_token
         
         console.log("🔍 Verificando token:", token ? "✅ Token encontrado" : "❌ No hay token");
         
@@ -87,12 +88,12 @@ const HomePage: React.FC = () => {
               } else {
                 console.warn("❌ Token inválido, eliminando...");
                 setEstaAutenticado(false);
-                localStorage.removeItem("authToken");
+                localStorage.removeItem("airfilms_token"); // ← Cambiado
               }
             } else {
               console.warn("❌ Token inválido (status " + response.status + "), eliminando...");
               setEstaAutenticado(false);
-              localStorage.removeItem("authToken");
+              localStorage.removeItem("airfilms_token"); // ← Cambiado
             }
           } catch (err) {
             console.error("❌ Error al verificar token:", err);
@@ -118,7 +119,7 @@ const HomePage: React.FC = () => {
 
     // Escuchar cambios en localStorage (cuando se hace login/logout en otra pestaña)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "authToken") {
+      if (e.key === "airfilms_token") { // ← Cambiado
         console.log("🔄 Token cambió en localStorage, re-verificando...");
         verificarAutenticacion();
       }
@@ -129,62 +130,46 @@ const HomePage: React.FC = () => {
   }, []);
 
   /**
-   * Carga videos según el tipo de usuario
+   * Carga películas según el tipo de usuario
    */
   useEffect(() => {
     if (estaCargando) return;
 
-    const cargarVideos = async () => {
+    const cargarPeliculas = async () => {
       try {
         setError(null);
-        const apiUrl = import.meta.env.VITE_API_LOCAL_URL || import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
 
         if (estaAutenticado) {
-          // Usuario autenticado: cargar más videos
+          // Usuario autenticado: cargar más películas
           try {
-            const urlRecomendados = `${apiUrl}/videos/search?query=popular`;
-            const respuestaRecomendados = await fetch(urlRecomendados);
-            
-            if (respuestaRecomendados.ok) {
-              const datosRecomendados = await respuestaRecomendados.json();
-              setVideosRecomendados(Array.isArray(datosRecomendados) ? datosRecomendados.slice(0, 6) : []);
-            }
+            const respuestaPopulares = await servicioPeliculas.obtenerPopulares(1);
+            setPeliculasRecomendadas(respuestaPopulares.results.slice(0, 6));
           } catch (err) {
-            console.error("Error al cargar recomendados:", err);
+            console.error("Error al cargar recomendadas:", err);
           }
 
           try {
-            const urlRecientes = `${apiUrl}/videos/search?query=nature`;
-            const respuestaRecientes = await fetch(urlRecientes);
-            
-            if (respuestaRecientes.ok) {
-              const datosRecientes = await respuestaRecientes.json();
-              setVideosDestacados(Array.isArray(datosRecientes) ? datosRecientes.slice(0, 4) : []);
-            }
+            const respuestaAccion = await servicioPeliculas.buscarPorGenero("28"); // Acción
+            setPeliculasDestacadas(respuestaAccion.results.slice(0, 4));
           } catch (err) {
-            console.error("Error al cargar recientes:", err);
+            console.error("Error al cargar destacadas:", err);
           }
         } else {
-          // Usuario NO autenticado: solo 4 videos destacados
+          // Usuario NO autenticado: solo 4 películas destacadas
           try {
-            const url = `${apiUrl}/videos/search?query=popular`;
-            const respuesta = await fetch(url);
-            
-            if (respuesta.ok) {
-              const datos = await respuesta.json();
-              setVideosDestacados(Array.isArray(datos) ? datos.slice(0, 4) : []);
-            }
+            const respuesta = await servicioPeliculas.obtenerPopulares(1);
+            setPeliculasDestacadas(respuesta.results.slice(0, 4));
           } catch (err) {
-            console.error("Error al cargar destacados:", err);
+            console.error("Error al cargar destacadas:", err);
           }
         }
       } catch (err: any) {
-        console.error("Error al cargar videos:", err);
-        setError(err.message || "Error al cargar los videos");
+        console.error("Error al cargar películas:", err);
+        setError(err.message || "Error al cargar las películas");
       }
     };
 
-    cargarVideos();
+    cargarPeliculas();
   }, [estaAutenticado, estaCargando]);
 
   /**
@@ -267,7 +252,7 @@ const HomePage: React.FC = () => {
             </div>
           </section>
 
-          {/* Videos Recomendados */}
+          {/* Películas Recomendadas */}
           <section className="home-page__section">
             <div className="home-page__section-header">
               <h2 className="home-page__section-title">Recomendados para Ti</h2>
@@ -280,44 +265,52 @@ const HomePage: React.FC = () => {
               <div className="home-page__error"><p>{error}</p></div>
             ) : (
               <div className="home-page__videos-grid">
-                {videosRecomendados.length > 0 ? (
-                  videosRecomendados.map((video) => (
-                    <div key={video.id} className="home-page__video-card">
+                {peliculasRecomendadas.length > 0 ? (
+                  peliculasRecomendadas.map((movie) => (
+                    <div key={movie.id} className="home-page__video-card" onClick={() => navigate(`/peliculas`)}>
                       <div className="home-page__video-image">
-                        <img src={video.thumbnail} alt={`Video ${video.id}`} loading="lazy" />
+                        {movie.poster ? (
+                          <img src={movie.poster} alt={movie.title} loading="lazy" />
+                        ) : (
+                          <div className="home-page__no-poster">Sin imagen</div>
+                        )}
                         <div className="home-page__video-overlay">
                           <svg className="home-page__play-icon" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 5v14l11-7z" />
                           </svg>
                         </div>
                       </div>
-                      <p className="home-page__video-id">ID: {video.id}</p>
+                      <p className="home-page__video-id">{movie.title}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="home-page__no-videos">No hay videos disponibles</p>
+                  <p className="home-page__no-videos">No hay películas disponibles</p>
                 )}
               </div>
             )}
           </section>
 
-          {/* Videos Recientes */}
+          {/* Películas Recientes */}
           <section className="home-page__section">
             <div className="home-page__section-header">
               <h2 className="home-page__section-title">Agregados Recientemente</h2>
             </div>
             <div className="home-page__videos-grid home-page__videos-grid--compact">
-              {videosDestacados.map((video) => (
-                <div key={video.id} className="home-page__video-card">
+              {peliculasDestacadas.map((movie) => (
+                <div key={movie.id} className="home-page__video-card" onClick={() => navigate(`/peliculas`)}>
                   <div className="home-page__video-image">
-                    <img src={video.thumbnail} alt={`Video ${video.id}`} loading="lazy" />
+                    {movie.poster ? (
+                      <img src={movie.poster} alt={movie.title} loading="lazy" />
+                    ) : (
+                      <div className="home-page__no-poster">Sin imagen</div>
+                    )}
                     <div className="home-page__video-overlay">
                       <svg className="home-page__play-icon" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="home-page__video-id">ID: {video.id}</p>
+                  <p className="home-page__video-id">{movie.title}</p>
                 </div>
               ))}
             </div>
@@ -375,7 +368,7 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Sección de Videos Destacados */}
+        {/* Sección de Películas Destacadas */}
         <section className="home-page__featured">
           <h2 className="home-page__featured-title">Destacados</h2>
           
@@ -383,22 +376,26 @@ const HomePage: React.FC = () => {
             <div className="home-page__error"><p>{error}</p></div>
           ) : (
             <div className="home-page__featured-grid">
-              {videosDestacados.length > 0 ? (
-                videosDestacados.map((video) => (
-                  <div key={video.id} className="home-page__video-card">
+              {peliculasDestacadas.length > 0 ? (
+                peliculasDestacadas.map((movie) => (
+                  <div key={movie.id} className="home-page__video-card" onClick={() => navigate(`/peliculas`)}>
                     <div className="home-page__video-image">
-                      <img src={video.thumbnail} alt={`Video ${video.id}`} loading="lazy" />
+                      {movie.poster ? (
+                        <img src={movie.poster} alt={movie.title} loading="lazy" />
+                      ) : (
+                        <div className="home-page__no-poster">Sin imagen</div>
+                      )}
                       <div className="home-page__video-overlay">
                         <svg className="home-page__play-icon" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
                     </div>
-                    <p className="home-page__video-id">ID: {video.id}</p>
+                    <p className="home-page__video-id">{movie.title}</p>
                   </div>
                 ))
               ) : (
-                <p className="home-page__no-videos">No hay videos disponibles</p>
+                <p className="home-page__no-videos">No hay películas disponibles</p>
               )}
             </div>
           )}
