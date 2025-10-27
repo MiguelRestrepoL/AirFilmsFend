@@ -8,7 +8,7 @@ import type { Movie, MovieFavorite, Genre } from "../../types/movies.types";
 import "./peliculas.scss";
 
 /**
- * Géneros de TMDB para filtrado
+ * TMDB genres for filtering
  */
 const GENRES: Genre[] = [
   { id: "28", name: "Acción", tmdbId: "28" },
@@ -24,12 +24,17 @@ const GENRES: Genre[] = [
 ];
 
 /**
- * Página principal de películas con TMDB.
- * Funcionalidades:
- * - Búsqueda por nombre
- * - Filtrado por género
- * - Películas populares
- * - Sistema de favoritos (solo usuarios autenticados)
+ * Main movies page component with TMDB integration.
+ * 
+ * Features:
+ * - Search movies by name
+ * - Filter by genre
+ * - Display popular movies
+ * - Favorites system (authenticated users only)
+ * - Full WCAG 2.1 AA compliance
+ * 
+ * @component
+ * @returns {JSX.Element} The movies page component
  */
 const PeliculasPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -41,7 +46,10 @@ const PeliculasPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showingFavorites, setShowingFavorites] = useState(false);
 
-  // Verificar autenticación al cargar
+  /**
+   * Verifies user authentication on component mount
+   * Listens to authentication changes across browser tabs
+   */
   useEffect(() => {
     const verificarAuth = () => {
       const token = localStorage.getItem("authToken");
@@ -51,7 +59,6 @@ const PeliculasPage: React.FC = () => {
 
     verificarAuth();
 
-    // Escuchar cambios de autenticación en otras pestañas
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "authToken") {
         console.log("🔄 [PELÍCULAS] Token cambió en localStorage");
@@ -63,7 +70,9 @@ const PeliculasPage: React.FC = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Cargar favoritos cuando hay autenticación
+  /**
+   * Loads user favorites when authenticated
+   */
   useEffect(() => {
     if (isAuthenticated) {
       loadFavorites();
@@ -72,13 +81,19 @@ const PeliculasPage: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  // Cargar películas populares al iniciar
+  /**
+   * Loads popular movies on initial render
+   */
   useEffect(() => {
     loadPopularMovies();
   }, []);
 
   /**
-   * Carga los favoritos del usuario autenticado
+   * Fetches the authenticated user's favorite movies
+   * 
+   * @async
+   * @function loadFavorites
+   * @returns {Promise<void>}
    */
   const loadFavorites = async () => {
     try {
@@ -86,14 +101,18 @@ const PeliculasPage: React.FC = () => {
       setFavorites(data);
     } catch (err) {
       console.error("Error al cargar favoritos:", err);
-      // Si falla, probablemente el token expiró
       setIsAuthenticated(false);
       setFavorites([]);
     }
   };
 
   /**
-   * Busca películas por nombre
+   * Searches for movies by name
+   * 
+   * @async
+   * @function searchMovies
+   * @param {string} query - The search query
+   * @returns {Promise<void>}
    */
   const searchMovies = async (query: string) => {
     try {
@@ -112,7 +131,11 @@ const PeliculasPage: React.FC = () => {
   };
 
   /**
-   * Carga películas populares
+   * Fetches popular movies from TMDB
+   * 
+   * @async
+   * @function loadPopularMovies
+   * @returns {Promise<void>}
    */
   const loadPopularMovies = async () => {
     try {
@@ -131,7 +154,12 @@ const PeliculasPage: React.FC = () => {
   };
 
   /**
-   * Filtra películas por género
+   * Filters movies by genre
+   * 
+   * @async
+   * @function filterByGenre
+   * @param {string} genreId - The TMDB genre ID
+   * @returns {Promise<void>}
    */
   const filterByGenre = async (genreId: string) => {
     try {
@@ -150,7 +178,12 @@ const PeliculasPage: React.FC = () => {
   };
 
   /**
-   * Muestra las películas favoritas del usuario
+   * Displays the user's favorite movies with full details
+   * Fetches complete movie information for each favorite
+   * 
+   * @async
+   * @function showFavorites
+   * @returns {Promise<void>}
    */
   const showFavorites = async () => {
     if (!isAuthenticated) {
@@ -163,7 +196,6 @@ const PeliculasPage: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Cargar detalles completos de cada favorito
       const favMoviesPromises = favorites.map(async (fav) => {
         try {
           const details = await servicioPeliculas.obtenerDetalles(fav.movieId);
@@ -175,7 +207,6 @@ const PeliculasPage: React.FC = () => {
           };
         } catch (error) {
           console.error(`Error cargando detalles de película ${fav.movieId}:`, error);
-          // Si falla, usar datos básicos del favorito
           return {
             id: fav.movieId,
             title: fav.movieName,
@@ -196,7 +227,13 @@ const PeliculasPage: React.FC = () => {
   };
 
   /**
-   * Alterna el estado de favorito de una película
+   * Toggles a movie's favorite status
+   * Adds or removes a movie from the user's favorites list
+   * 
+   * @async
+   * @function toggleFavorite
+   * @param {number} movieId - The TMDB movie ID
+   * @returns {Promise<void>}
    */
   const toggleFavorite = async (movieId: number) => {
     if (!isAuthenticated) {
@@ -208,16 +245,13 @@ const PeliculasPage: React.FC = () => {
       const isFav = servicioFavoritos.esFavorito(movieId, favorites);
 
       if (isFav) {
-        // Eliminar de favoritos
         await servicioFavoritos.eliminarFavorito(movieId);
         setFavorites(favorites.filter(fav => fav.movieId !== movieId));
         
-        // Si estamos viendo favoritos, actualizar la vista
         if (showingFavorites) {
           setMovies(movies.filter(m => m.id !== movieId));
         }
       } else {
-        // Buscar la película completa para tener nombre y poster
         const movie = movies.find(m => m.id === movieId);
         
         if (!movie) {
@@ -225,7 +259,6 @@ const PeliculasPage: React.FC = () => {
           return;
         }
 
-        // Agregar con todos los datos necesarios
         const newFavorite = await servicioFavoritos.agregarFavorito({
           movieId: movie.id,
           movieName: movie.title,
@@ -238,7 +271,6 @@ const PeliculasPage: React.FC = () => {
       console.error("Error al manejar favorito:", err);
       alert(err.message || "Error al actualizar favoritos");
       
-      // Si es error de sesión, recargar favoritos
       if (err.message.includes("Sesión expirada") || err.message.includes("Token")) {
         setIsAuthenticated(false);
         setFavorites([]);
@@ -247,7 +279,11 @@ const PeliculasPage: React.FC = () => {
   };
 
   /**
-   * Verifica si una película está en favoritos
+   * Checks if a movie is in the user's favorites
+   * 
+   * @function isFavorite
+   * @param {number} movieId - The TMDB movie ID
+   * @returns {boolean} True if the movie is favorited
    */
   const isFavorite = (movieId: number): boolean => {
     return servicioFavoritos.esFavorito(movieId, favorites);
@@ -257,13 +293,31 @@ const PeliculasPage: React.FC = () => {
     <div className="movie-page">
       <div className="movie-page__header">
         <h1 className="movie-page__title">Películas</h1>
-        <SearchBar alBuscar={searchMovies} marcadorPosicion="Buscar películas..." />
+        <SearchBar 
+          alBuscar={searchMovies} 
+          marcadorPosicion="Buscar películas..." 
+        />
         
-        {/* Mensaje para usuarios no autenticados */}
+        {/* Authentication notice for non-authenticated users */}
         {!isAuthenticated && (
-          <div className="movie-page__auth-notice">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div 
+            className="movie-page__auth-notice"
+            role="status"
+            aria-live="polite"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+              />
             </svg>
             <span>Inicia sesión para guardar tus películas favoritas</span>
           </div>
@@ -271,11 +325,17 @@ const PeliculasPage: React.FC = () => {
       </div>
 
       <div className="movie-page__container">
-        {/* Filtros de género */}
-        <div className="movie-page__filters">
+        {/* Genre filters */}
+        <nav 
+          className="movie-page__filters" 
+          role="navigation" 
+          aria-label="Filtros de películas"
+        >
           <button
             className={`movie-page__filter ${activeFilter === "popular" ? "movie-page__filter--active" : ""}`}
             onClick={loadPopularMovies}
+            aria-pressed={activeFilter === "popular"}
+            aria-label="Mostrar películas populares"
           >
             Populares
           </button>
@@ -285,22 +345,28 @@ const PeliculasPage: React.FC = () => {
               key={genre.id}
               className={`movie-page__filter ${activeFilter === genre.tmdbId ? "movie-page__filter--active" : ""}`}
               onClick={() => filterByGenre(genre.tmdbId)}
+              aria-pressed={activeFilter === genre.tmdbId}
+              aria-label={`Filtrar por género ${genre.name}`}
             >
               {genre.name}
             </button>
           ))}
 
-          {/* Botón de favoritos - solo visible si está autenticado */}
+          {/* Favorites button - visible only when authenticated */}
           {isAuthenticated && (
             <button
               className={`movie-page__filter movie-page__filter--favorites ${activeFilter === "favorites" ? "movie-page__filter--active" : ""}`}
               onClick={showFavorites}
+              aria-pressed={activeFilter === "favorites"}
+              aria-label={`Mostrar mis favoritos${favorites.length > 0 ? `, ${favorites.length} películas` : ''}`}
             >
               <svg 
                 viewBox="0 0 24 24" 
                 fill={activeFilter === "favorites" ? "currentColor" : "none"} 
                 stroke="currentColor"
                 style={{ width: "18px", height: "18px", marginRight: "8px" }}
+                aria-hidden="true"
+                focusable="false"
               >
                 <path
                   strokeLinecap="round"
@@ -309,26 +375,50 @@ const PeliculasPage: React.FC = () => {
                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                 />
               </svg>
-              Mis Favoritos {favorites.length > 0 && `(${favorites.length})`}
+              <span>
+                Mis Favoritos {favorites.length > 0 && `(${favorites.length})`}
+              </span>
             </button>
           )}
-        </div>
+        </nav>
 
+        {/* Error message */}
         {error && (
-          <div className="movie-page__error">
+          <div 
+            className="movie-page__error" 
+            role="alert"
+            aria-live="assertive"
+          >
             <p>{error}</p>
           </div>
         )}
 
+        {/* Loading state */}
         {isLoading ? (
-          <div className="movie-page__loading">
-            <div className="movie-page__spinner"></div>
+          <div 
+            className="movie-page__loading"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <div 
+              className="movie-page__spinner"
+              aria-hidden="true"
+            ></div>
             <p>Cargando películas...</p>
           </div>
         ) : (
-          <div className="movie-page__grid">
+          <div 
+            className="movie-page__grid"
+            role="region"
+            aria-label="Resultados de películas"
+          >
             {movies.length === 0 ? (
-              <div className="movie-page__empty">
+              <div 
+                className="movie-page__empty"
+                role="status"
+                aria-live="polite"
+              >
                 {showingFavorites ? (
                   <p>No tienes películas favoritas aún. ¡Agrega algunas con la estrella! ⭐</p>
                 ) : (
@@ -351,6 +441,7 @@ const PeliculasPage: React.FC = () => {
         )}
       </div>
 
+      {/* Movie details modal */}
       {selectedMovieId && (
         <MovieModal
           movieId={selectedMovieId}

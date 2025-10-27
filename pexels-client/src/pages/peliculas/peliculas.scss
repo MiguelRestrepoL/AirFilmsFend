@@ -26,6 +26,29 @@
     padding: 0 2rem;
   }
 
+  // ✅ WCAG: Authentication notice with proper contrast
+  &__auth-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 1.5rem auto;
+    padding: 1rem 1.5rem;
+    background: rgba(33, 150, 243, 0.15);
+    border: 2px solid rgba(33, 150, 243, 0.4);
+    border-radius: 12px;
+    color: #90caf9; 
+    font-size: 0.95rem;
+    max-width: 600px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      color: #64b5f6;
+    }
+  }
+
   &__filters {
     display: flex;
     gap: 1rem;
@@ -33,28 +56,36 @@
     overflow-x: auto;
     padding-bottom: 0.5rem;
     
+    // WCAG: Scrollbar with better visibility
     &::-webkit-scrollbar {
-      height: 6px;
+      height: 8px; // Increased for better touch target
     }
     
     &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
     }
     
     &::-webkit-scrollbar-thumb {
       background: #ff5722;
-      border-radius: 3px;
+      border-radius: 4px;
+      
+      &:hover {
+        background: #ff7043;
+      }
     }
   }
 
   &__filter {
-    background: rgba(45, 45, 45, 0.6);
+    background: rgba(60, 60, 60, 0.8); 
     border: 2px solid transparent;
-    color: white;
+    color: #ffffff; 
     padding: 0.75rem 1.5rem;
+    min-height: 44px; 
+    min-width: 44px;
     border-radius: 25px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -62,33 +93,70 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+
+    // WCAG: Clear focus indicator
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+    }
+
+    // WCAG: Visible focus for keyboard navigation
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
 
     &:hover {
-      background: rgba(255, 87, 34, 0.2);
-      border-color: #ff5722;
+      background: rgba(255, 87, 34, 0.3);
+      border-color: #ff7043;
+      transform: translateY(-2px);
+    }
+
+    // WCAG: Clear active state
+    &:active {
+      transform: translateY(0);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     &--active {
       background: linear-gradient(135deg, #ff5722, #ff7043);
       border-color: #ff5722;
       box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+      color: #ffffff;
+      font-weight: 700;
     }
 
     &--favorites {
-      background: rgba(255, 193, 7, 0.15);
-      border-color: rgba(255, 193, 7, 0.3);
+      background: rgba(255, 193, 7, 0.2);
+      border-color: rgba(255, 193, 7, 0.4);
+      color: #ffffff;
+
+      svg {
+        color: #ffd54f;
+      }
 
       &:hover {
-        background: rgba(255, 193, 7, 0.25);
-        border-color: #ffc107;
+        background: rgba(255, 193, 7, 0.3);
+        border-color: #ffca28;
+      }
+
+      
+      &:focus-visible {
+        outline-color: #ffd54f;
+        box-shadow: 0 0 0 5px rgba(255, 193, 7, 0.2);
       }
 
       &.movie-page__filter--active {
         background: linear-gradient(135deg, #ffc107, #ffb300);
         border-color: #ffc107;
         box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        color: #000000;
+        font-weight: 700;
 
         svg {
+          color: #000000;
           animation: starPulse 2s ease-in-out infinite;
         }
       }
@@ -104,14 +172,21 @@
     }
   }
 
+
   &__error {
-    background: rgba(255, 87, 34, 0.2);
-    border: 2px solid #ff5722;
+    background: rgba(211, 47, 47, 0.2);
+    border: 2px solid #ef5350;
     border-radius: 12px;
     padding: 1.5rem;
     margin: 2rem 0;
     text-align: center;
-    color: white;
+    color: #ffcdd2; 
+    font-weight: 500;
+
+    p {
+      margin: 0;
+      line-height: 1.5;
+    }
   }
 
   &__loading {
@@ -120,14 +195,19 @@
     align-items: center;
     justify-content: center;
     padding: 4rem 2rem;
-    color: white;
+    color: #e0e0e0; 
+
+    p {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
   }
 
   &__spinner {
     width: 60px;
     height: 60px;
     border: 4px solid rgba(255, 87, 34, 0.3);
-    border-top-color: #ff5722;
+    border-top-color: #ff7043;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
@@ -155,9 +235,11 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: #b0b0b0; 
     font-size: 1.125rem;
+    line-height: 1.6;
   }
+
 
   @media (max-width: 768px) {
     &__title {
@@ -170,6 +252,48 @@
 
     &__container {
       padding: 0 1rem;
+    }
+
+    &__filter {
+      font-size: 0.9rem;
+      padding: 0.65rem 1.25rem;
+      min-height: 44px; 
+    }
+  }
+
+
+  @media (prefers-contrast: high) {
+    &__filter {
+      border-width: 3px;
+      
+      &:focus-visible {
+        outline-width: 4px;
+      }
+    }
+
+    &__error {
+      border-width: 3px;
+    }
+
+    &__auth-notice {
+      border-width: 3px;
+    }
+  }
+
+
+  @media (prefers-reduced-motion: reduce) {
+    &__filter,
+    &__spinner,
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    @keyframes starPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
     }
   }
 }
