@@ -1,3 +1,15 @@
+// ============================================
+// HOME PAGE COMPONENT - WCAG 2.1 AA COMPLIANT
+// ============================================
+// Accessibility features:
+// - Contrast ratios meet 4.5:1 minimum (text)
+// - Focus indicators with 3:1 contrast
+// - 44x44px minimum touch targets
+// - Keyboard navigation support
+// - Reduced motion support
+// - Clear visual hierarchy
+// ============================================
+
 .home-page {
   width: 100%;
   min-height: 100vh;
@@ -17,7 +29,7 @@
   }
 
   // ============================================
-  // HERO SECTION (Usuario NO autenticado)
+  // HERO SECTION (Unauthenticated user)
   // ============================================
   &__hero {
     position: relative;
@@ -30,7 +42,6 @@
     justify-content: center;
     overflow: hidden;
 
-    // Imagen de fondo
     &::before {
       content: '';
       position: absolute;
@@ -45,7 +56,6 @@
       z-index: 0;
     }
 
-    // Overlay gradient
     &::after {
       content: '';
       position: absolute;
@@ -62,7 +72,6 @@
       z-index: 1;
     }
 
-    // HERO PARA USUARIO AUTENTICADO
     &--protected {
       height: auto;
       min-height: auto;
@@ -97,6 +106,10 @@
       gap: 2rem;
       text-align: left;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__welcome {
@@ -126,14 +139,14 @@
 
   &__hero-subtitle {
     font-size: 1.5rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
     margin: 0 0 2.5rem;
     line-height: 1.6;
     font-weight: 400;
 
     .home-page--protected & {
       font-size: 1.25rem;
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
       margin: 0;
     }
   }
@@ -152,6 +165,8 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(255, 87, 34, 0.4);
+    min-height: 56px;
+    min-width: 44px;
 
     &:hover {
       transform: translateY(-3px);
@@ -163,8 +178,17 @@
     }
 
     &:focus-visible {
-      outline: 3px solid rgba(255, 255, 255, 0.5);
+      outline: 3px solid rgba(255, 255, 255, 0.8);
       outline-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover,
+      &:active {
+        transform: none;
+      }
     }
   }
 
@@ -182,6 +206,8 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-height: 56px;
+    min-width: 44px;
 
     &--primary {
       background: white;
@@ -190,6 +216,11 @@
       &:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      &:focus-visible {
+        outline: 3px solid white;
+        outline-offset: 4px;
       }
     }
 
@@ -201,16 +232,24 @@
       &:hover {
         background: rgba(255, 255, 255, 0.1);
       }
+
+      &:focus-visible {
+        outline: 3px solid white;
+        outline-offset: 4px;
+      }
     }
 
-    &:focus-visible {
-      outline: 3px solid white;
-      outline-offset: 4px;
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
     }
   }
 
   // ============================================
-  // CONTENIDO PRINCIPAL
+  // MAIN CONTENT
   // ============================================
   &__content {
     max-width: 1400px;
@@ -243,20 +282,36 @@
   &__see-all {
     background: transparent;
     border: none;
-    color: #ff9800;
+    color: #ffb74d;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    min-height: 44px;
+    border-radius: 8px;
 
     &:hover {
       color: #ff5722;
       transform: translateX(5px);
     }
+
+    &:focus-visible {
+      outline: 3px solid #ff5722;
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
   }
 
   // ============================================
-  // CATEGORÍAS RÁPIDAS (Usuario autenticado)
+  // QUICK CATEGORIES (Authenticated user)
   // ============================================
   &__quick-categories {
     margin-bottom: 4rem;
@@ -298,6 +353,8 @@
     align-items: center;
     gap: 0.75rem;
     min-width: 140px;
+    min-height: 120px;
+    justify-content: center;
 
     &:hover {
       background: rgba(255, 87, 34, 0.2);
@@ -306,10 +363,23 @@
       box-shadow: 0 10px 30px rgba(255, 87, 34, 0.3);
     }
 
+    &:focus-visible {
+      outline: 3px solid #ff5722;
+      outline-offset: 2px;
+    }
+
     span {
       color: white;
       font-weight: 600;
       font-size: 0.95rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
     }
   }
 
@@ -318,7 +388,7 @@
   }
 
   // ============================================
-  // CATEGORÍAS (Usuario NO autenticado)
+  // CATEGORIES (Unauthenticated user)
   // ============================================
   &__categories-section {
     margin-bottom: 6rem;
@@ -345,13 +415,15 @@
     padding: 1.25rem 1.5rem;
     background: rgba(255, 255, 255, 0.03);
     border: 2px solid rgba(255, 87, 34, 0.2);
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
     backdrop-filter: blur(10px);
+    min-height: 56px;
+    min-width: 120px;
 
     &:hover {
       background: rgba(255, 87, 34, 0.1);
@@ -366,13 +438,22 @@
     }
 
     &:focus-visible {
-      outline: 2px solid #ff5722;
+      outline: 3px solid #ff5722;
       outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover,
+      &:active {
+        transform: none;
+      }
     }
   }
 
   // ============================================
-  // VIDEOS
+  // VIDEOS/MOVIES
   // ============================================
   &__featured {
     margin-bottom: 6rem;
@@ -425,6 +506,30 @@
         transform: scale(1.05);
       }
     }
+
+    &:focus-visible {
+      outline: 3px solid #ff5722;
+      outline-offset: 2px;
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(255, 87, 34, 0.3);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover,
+      &:focus-visible {
+        transform: none;
+      }
+
+      .home-page__video-image img {
+        transition: none;
+
+        &:hover {
+          transform: none;
+        }
+      }
+    }
   }
 
   &__video-image {
@@ -457,6 +562,10 @@
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   &__play-icon {
@@ -465,17 +574,35 @@
     color: #ff5722;
     filter: drop-shadow(0 6px 12px rgba(255, 87, 34, 0.5));
     animation: pulse 2s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__video-id {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.875rem;
     padding: 1rem;
     margin: 0;
   }
 
+  &__no-poster {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2a2a2a;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+  }
+
   // ============================================
-  // INFO DEL USUARIO (Solo autenticado)
+  // USER INFO (Authenticated only)
   // ============================================
   &__user-info {
     margin-top: 3rem;
@@ -516,7 +643,7 @@
   }
 
   // ============================================
-  // ESTADOS
+  // STATES
   // ============================================
   &__loading {
     display: flex;
@@ -535,12 +662,16 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1.5rem;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: spin 3s linear infinite;
+    }
   }
 
   &__no-videos {
     grid-column: 1 / -1;
     text-align: center;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 1.125rem;
     padding: 3rem;
   }
@@ -558,7 +689,7 @@
 }
 
 // ============================================
-// ANIMACIONES
+// ANIMATIONS
 // ============================================
 @keyframes fadeInUp {
   from {

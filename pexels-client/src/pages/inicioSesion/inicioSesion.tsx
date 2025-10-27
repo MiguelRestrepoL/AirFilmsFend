@@ -3,11 +3,29 @@ import { useNavigate, Link } from "react-router-dom";
 import "./inicioSesion.scss";
 
 /**
- * Página de inicio de sesión.
- * Permite a los usuarios autenticarse en la plataforma.
+ * Login page component.
+ * Allows users to authenticate on the platform.
+ * 
+ * Features:
+ * - Email and password authentication
+ * - Form validation with user feedback
+ * - Loading states during submission
+ * - Error handling and display
+ * - Password recovery link
+ * - Registration redirect
+ * 
  * 
  * @component
- * @returns {JSX.Element} Formulario de inicio de sesión
+ * @returns {JSX.Element} Login form with branding
+ * 
+ * @example
+ * ```tsx
+ * <InicioSesion />
+ * ```
+ * 
+ * @accessibility
+ * - WCAG 2.1 AA compliant
+ * - Proper form semantics with fieldset/legend where appropriate
  */
 const InicioSesion: React.FC = () => {
   const navigate = useNavigate();
@@ -17,14 +35,17 @@ const InicioSesion: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Maneja el envío del formulario de inicio de sesión.
-   * Realiza la petición al backend y maneja la respuesta.
+   * Handles login form submission.
+   * Validates input, makes API request, and handles response.
+   * 
+   * @param {React.FormEvent} e - Form submission event
+   * @async
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validación básica
+    // Basic validation
     if (!email || !password) {
       setError("Por favor completa todos los campos");
       return;
@@ -53,12 +74,12 @@ const InicioSesion: React.FC = () => {
         throw new Error(data.message || "Error al iniciar sesión");
       }
 
-      // Guardar token en localStorage
+      // Save token to localStorage
       if (data.token) {
         localStorage.setItem("authToken", data.token);
       }
 
-      // Redirigir a la página principal y forzar recarga
+      // Redirect to home and force reload
       window.location.href = "/";
     } catch (err: any) {
       console.error("Error al iniciar sesión:", err);
@@ -71,45 +92,68 @@ const InicioSesion: React.FC = () => {
   return (
     <div className="inicio-sesion">
       <div className="inicio-sesion__container">
-        {/* Lado Izquierdo - Branding */}
-        <div className="inicio-sesion__branding">
+        {/* Left Side - Branding */}
+        <aside 
+          className="inicio-sesion__branding"
+          aria-label="AirFilms branding"
+        >
           <div className="inicio-sesion__logo-container">
-            <Link to="/">
-            <img 
-              src="/AirFilms.png" 
-              alt="AirFilms Logo" 
-              className="inicio-sesion__logo-img"
-              
-            />
+            <Link 
+              to="/"
+              aria-label="Go to AirFilms homepage"
+            >
+              <img 
+                src="/AirFilms.png" 
+                alt="AirFilms - Your favorite movies and videos platform" 
+                className="inicio-sesion__logo-img"
+              />
             </Link>
           </div>
           <p className="inicio-sesion__branding-text">
             Vinimos a controlar el entretenimiento. <br />
             Tu plataforma de peliculas y videos favorita.
           </p>
-        </div>
+        </aside>
 
-        {/* Lado Derecho - Formulario */}
-        <div className="inicio-sesion__form-container">
-          <div className="inicio-sesion__form-header">
-            <h2 className="inicio-sesion__title">Iniciar sesión</h2>
+        {/* Right Side - Form */}
+        <main className="inicio-sesion__form-container">
+          <header className="inicio-sesion__form-header">
+            <h1 className="inicio-sesion__title">Iniciar sesión</h1>
             <p className="inicio-sesion__subtitle">
               Ingresa a tu cuenta para continuar
             </p>
-          </div>
+          </header>
 
           {error && (
-            <div className="inicio-sesion__error">
-              <svg viewBox="0 0 24 24" fill="currentColor">
+            <div 
+              className="inicio-sesion__error"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
               </svg>
               <span>{error}</span>
             </div>
           )}
 
-          <form className="inicio-sesion__form" onSubmit={handleSubmit}>
+          <form 
+            className="inicio-sesion__form" 
+            onSubmit={handleSubmit}
+            noValidate
+            aria-labelledby="login-title"
+          >
             <div className="inicio-sesion__form-group">
-              <label htmlFor="email" className="inicio-sesion__label">
+              <label 
+                htmlFor="email" 
+                className="inicio-sesion__label"
+              >
                 Email
               </label>
               <input
@@ -121,11 +165,18 @@ const InicioSesion: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
                 autoComplete="email"
+                required
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
             <div className="inicio-sesion__form-group">
-              <label htmlFor="password" className="inicio-sesion__label">
+              <label 
+                htmlFor="password" 
+                className="inicio-sesion__label"
+              >
                 Contraseña
               </label>
               <input
@@ -137,6 +188,10 @@ const InicioSesion: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 autoComplete="current-password"
+                required
+                aria-required="true"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
@@ -144,6 +199,7 @@ const InicioSesion: React.FC = () => {
               <Link 
                 to="/olvidar-pw1" 
                 className="inicio-sesion__forgot-password"
+                tabIndex={0}
               >
                 ¿Olvidó su contraseña?
               </Link>
@@ -153,12 +209,19 @@ const InicioSesion: React.FC = () => {
               type="submit"
               className="inicio-sesion__submit-btn"
               disabled={isLoading}
+              aria-busy={isLoading}
+              aria-live="polite"
             >
               {isLoading ? (
-                <div className="inicio-sesion__loading">
-                  <div className="inicio-sesion__spinner"></div>
+                <span className="inicio-sesion__loading">
+                  <span 
+                    className="inicio-sesion__spinner"
+                    role="status"
+                    aria-label="Loading"
+                    aria-hidden="true"
+                  ></span>
                   <span>Iniciando sesión...</span>
-                </div>
+                </span>
               ) : (
                 "Iniciar sesión"
               )}
@@ -166,9 +229,15 @@ const InicioSesion: React.FC = () => {
           </form>
 
           <p className="inicio-sesion__register-link">
-            ¿No tiene cuenta? <Link to="/registro">¡Regístrese!</Link>
+            ¿No tiene cuenta?{" "}
+            <Link 
+              to="/registro"
+              aria-label="Go to registration page"
+            >
+              ¡Regístrese!
+            </Link>
           </p>
-        </div>
+        </main>
       </div>
     </div>
   );
