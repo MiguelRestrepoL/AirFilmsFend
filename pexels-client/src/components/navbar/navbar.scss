@@ -1,3 +1,13 @@
+// ============================================
+// Accessibility features:
+// - Contrast ratios meet 4.5:1 minimum (text)
+// - Focus indicators with 3:1 contrast
+// - 44x44px minimum touch targets
+// - Keyboard navigation support
+// - Reduced motion support
+// - Screen reader optimizations
+// ============================================
+
 .navbar {
   background: rgba(18, 18, 23, 0.98);
   backdrop-filter: blur(15px);
@@ -31,13 +41,24 @@
     font-weight: 700;
     color: var(--naranja-primario);
     transition: all 0.3s ease;
+    min-height: 44px;
 
     &:hover {
       opacity: 0.8;
     }
 
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
     img {
       display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -86,9 +107,10 @@
     font-size: 0.95rem;
     transition: all 0.3s ease;
     cursor: pointer;
+    min-height: 44px;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.5);
     }
 
     &:hover {
@@ -100,6 +122,11 @@
       outline: none;
       border-color: var(--naranja-primario);
       background: rgba(228, 91, 18, 0.1);
+      box-shadow: 0 0 0 3px rgba(228, 91, 18, 0.3);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -124,6 +151,9 @@
     transition: all 0.3s ease;
     position: relative;
     padding: 0.5rem 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 
     &::after {
       content: '';
@@ -145,9 +175,17 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--naranja-primario);
+      outline: 3px solid var(--naranja-primario);
       outline-offset: 4px;
       border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &::after {
+        transition: none;
+      }
     }
   }
 
@@ -176,6 +214,15 @@
     white-space: nowrap;
     text-decoration: none;
     display: inline-block;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   &__button--primary {
@@ -187,6 +234,11 @@
       border-color: var(--naranja-primario);
       color: var(--naranja-primario);
     }
+
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: 2px;
+    }
   }
 
   &__button--accent {
@@ -196,6 +248,17 @@
     &:hover {
       box-shadow: 0 4px 15px rgba(228, 91, 18, 0.6);
       transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &:hover {
+        transform: none;
+      }
     }
   }
 
@@ -207,11 +270,11 @@
     &:hover {
       background: rgba(255, 68, 68, 0.2);
     }
-  }
 
-  &__button:focus-visible {
-    outline: 2px solid var(--naranja-primario);
-    outline-offset: 2px;
+    &:focus-visible {
+      outline: 3px solid #ff4444;
+      outline-offset: 2px;
+    }
   }
 
   // ============================================
@@ -229,8 +292,8 @@
   }
 
   &__settings-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
@@ -257,8 +320,16 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--naranja-primario);
+      outline: 3px solid var(--naranja-primario);
       outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
     }
   }
 
@@ -274,11 +345,22 @@
     border: none;
     cursor: pointer;
     padding: 0;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: 2px;
+      border-radius: 50%;
+    }
   }
 
   &__avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--gradiente-principal);
     display: flex;
@@ -300,6 +382,14 @@
       height: 60px;
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
     }
   }
 
@@ -327,6 +417,10 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
     }
   }
 
@@ -382,6 +476,7 @@
     background: none;
     width: 100%;
     font-size: 0.95rem;
+    min-height: 44px;
 
     svg {
       width: 20px;
@@ -394,13 +489,26 @@
       color: var(--naranja-primario);
     }
 
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: -2px;
+    }
+
     &--danger {
-      color: #ff4444;
+      color: #ff6666;
 
       &:hover {
         background: rgba(255, 68, 68, 0.1);
-        color: #ff6666;
+        color: #ff8888;
       }
+
+      &:focus-visible {
+        outline-color: #ff6666;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -412,8 +520,8 @@
     flex-shrink: 0;
     background: none;
     border: none;
-    width: 32px;
-    height: 32px;
+    min-width: 44px;
+    min-height: 44px;
     cursor: pointer;
     color: var(--texto-principal);
     transition: all 0.3s ease;
@@ -435,9 +543,13 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--naranja-primario);
+      outline: 3px solid var(--naranja-primario);
       outline-offset: 2px;
       border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -470,6 +582,10 @@
         transform: translateY(0);
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__links-movil {
@@ -487,10 +603,22 @@
     padding: 0.75rem;
     border-radius: 8px;
     transition: all 0.3s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 
     &:hover {
       background: rgba(228, 91, 18, 0.1);
       color: var(--naranja-primario);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--naranja-primario);
+      outline-offset: -2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 

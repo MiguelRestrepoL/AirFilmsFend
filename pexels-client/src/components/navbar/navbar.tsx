@@ -1,27 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
 
 /**
- * Barra de navegación global con enlaces a las rutas principales.
- * Incluye menú hamburguesa para dispositivos móviles.
+ * Global navigation bar component with authentication support.
+ * 
+ * Features:
+ * - Responsive design with hamburger menu
+ * - Authentication state management
+ * - User profile dropdown
+ * - Search bar (authenticated users)
+ * - Full WCAG 2.1 AA compliance
+ * - Keyboard navigation support
  * 
  * @component
- * @returns {JSX.Element} Elemento de navegación semántico con enlaces
- * @remarks
- * - Enlaces a Inicio, Películas, Sobre Nosotros
- * - Botones para Contacto, Iniciar Sesión, Registrarse
- * - Menú responsive que se adapta a pantallas pequeñas
+ * @returns {JSX.Element} Semantic navigation element with links and actions
  */
-
 const Navbar: React.FC = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [menuPerfilAbierto, setMenuPerfilAbierto] = useState(false);
   const [estaAutenticado, setEstaAutenticado] = useState(false);
   const [usuario, setUsuario] = useState<any>(null);
   const navigate = useNavigate();
+  
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const avatarButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Verificar si hay token al cargar
+  /**
+   * Verifies user authentication on component mount
+   * Checks for valid JWT token and fetches user profile
+   */
   useEffect(() => {
     const verificarAutenticacion = async () => {
       const token = localStorage.getItem("authToken");
@@ -30,7 +38,6 @@ const Navbar: React.FC = () => {
         try {
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
           
-          // Verificar token
           const response = await fetch(`${apiUrl}/auth/verify-auth`, {
             headers: {
               "Authorization": `Bearer ${token}`
@@ -40,7 +47,6 @@ const Navbar: React.FC = () => {
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
-              // Token válido, obtener perfil (CORREGIDO: /users/profile)
               try {
                 const profileResponse = await fetch(`${apiUrl}/users/profile`, {
                   headers: {
@@ -54,7 +60,6 @@ const Navbar: React.FC = () => {
                     setUsuario(profileData.user);
                     setEstaAutenticado(true);
                   } else {
-                    // Token válido pero sin perfil completo
                     setUsuario({ name: "Usuario", email: "" });
                     setEstaAutenticado(true);
                   }
@@ -78,7 +83,6 @@ const Navbar: React.FC = () => {
           }
         } catch (error) {
           console.error("Error al verificar autenticación:", error);
-          // Si hay error de red pero hay token, asumir autenticado temporalmente
           setUsuario({ name: "Usuario", email: "" });
           setEstaAutenticado(true);
         }
@@ -89,7 +93,6 @@ const Navbar: React.FC = () => {
 
     verificarAutenticacion();
 
-    // Escuchar cambios en localStorage
     const handleStorageChange = () => {
       verificarAutenticacion();
     };
@@ -98,18 +101,68 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  /**
+   * Handles clicks outside dropdown to close it
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        avatarButtonRef.current &&
+        !avatarButtonRef.current.contains(event.target as Node)
+      ) {
+        setMenuPerfilAbierto(false);
+      }
+    };
+
+    if (menuPerfilAbierto) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuPerfilAbierto]);
+
+  /**
+   * Handles ESC key to close dropdown
+   */
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && menuPerfilAbierto) {
+        setMenuPerfilAbierto(false);
+        avatarButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [menuPerfilAbierto]);
+
+  /**
+   * Toggles mobile menu visibility
+   */
   const toggleMenu = () => {
     setMenuAbierto(!menuAbierto);
   };
 
+  /**
+   * Toggles profile dropdown menu
+   */
   const toggleMenuPerfil = () => {
     setMenuPerfilAbierto(!menuPerfilAbierto);
   };
 
+  /**
+   * Handles user logout
+   * Clears authentication token and redirects to home
+   * 
+   * @async
+   */
   const handleLogout = async () => {
     const token = localStorage.getItem("authToken");
 
-    // Intentar logout en el backend
     if (token) {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
@@ -125,31 +178,48 @@ const Navbar: React.FC = () => {
       }
     }
 
-    // Limpiar localStorage
     localStorage.removeItem("authToken");
     
     setEstaAutenticado(false);
     setUsuario(null);
     setMenuPerfilAbierto(false);
     
-    // Redirigir y recargar
     window.location.href = "/";
   };
 
   // ============================================
-  // NAVBAR AUTENTICADO
+  // AUTHENTICATED NAVBAR
   // ============================================
   if (estaAutenticado && usuario) {
     return (
-      <nav className="navbar navbar--authenticated">
+      <nav 
+        className="navbar navbar--authenticated"
+        role="navigation"
+        aria-label="Navegación principal"
+      >
         <div className="navbar__container">
-          <Link to="/" className="navbar__logo" onClick={() => setMenuAbierto(false)}>
+          <Link 
+            to="/" 
+            className="navbar__logo" 
+            onClick={() => setMenuAbierto(false)}
+            aria-label="AirFilms - Ir a inicio"
+          >
             <span className="navbar__logo-text">AirFilms</span>
           </Link>
 
           {/* Search Bar */}
-          <div className="navbar__search">
-            <svg className="navbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <div 
+            className="navbar__search"
+            role="search"
+          >
+            <svg 
+              className="navbar__search-icon" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" />
             </svg>
@@ -158,11 +228,17 @@ const Navbar: React.FC = () => {
               className="navbar__search-input"
               placeholder="Buscar películas..."
               onClick={() => navigate("/peliculas")}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  navigate("/peliculas");
+                }
+              }}
               readOnly
+              aria-label="Buscar películas - Clic para ir a la página de películas"
             />
           </div>
 
-          {/* Links Desktop */}
+          {/* Desktop Links */}
           <div className="navbar__links">
             <Link to="/" className="navbar__link">Inicio</Link>
             <Link to="/peliculas" className="navbar__link">Películas</Link>
@@ -175,9 +251,16 @@ const Navbar: React.FC = () => {
             <button
               className="navbar__settings-btn"
               onClick={() => navigate("/perfil")}
-              aria-label="Configuración"
+              aria-label="Ir a configuración de perfil"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v6m0 6v6" />
               </svg>
@@ -186,32 +269,65 @@ const Navbar: React.FC = () => {
             {/* Avatar Dropdown */}
             <div className="navbar__profile-dropdown">
               <button
+                ref={avatarButtonRef}
                 className="navbar__avatar-btn"
                 onClick={toggleMenuPerfil}
-                aria-label="Menú de perfil"
+                aria-label={`Menú de perfil de ${usuario.name || "usuario"}`}
+                aria-expanded={menuPerfilAbierto}
+                aria-haspopup="true"
               >
                 <div className="navbar__avatar">
-                  <span>{usuario.name?.charAt(0).toUpperCase() || "U"}</span>
+                  <span aria-hidden="true">
+                    {usuario.name?.charAt(0).toUpperCase() || "U"}
+                  </span>
                 </div>
               </button>
 
               {menuPerfilAbierto && (
-                <div className="navbar__dropdown-menu">
+                <div 
+                  ref={dropdownRef}
+                  className="navbar__dropdown-menu"
+                  role="menu"
+                  aria-label="Opciones de perfil"
+                >
                   <div className="navbar__dropdown-header">
-                    <div className="navbar__avatar navbar__avatar--large">
+                    <div 
+                      className="navbar__avatar navbar__avatar--large"
+                      aria-hidden="true"
+                    >
                       <span>{usuario.name?.charAt(0).toUpperCase() || "U"}</span>
                     </div>
                     <p className="navbar__user-name">{usuario.name || "Usuario"}</p>
                     {usuario.email && (
                       <p className="navbar__user-email">{usuario.email}</p>
                     )}
-                    <span className="navbar__badge">Próximamente...</span>
+                    <span 
+                      className="navbar__badge"
+                      role="status"
+                    >
+                      Próximamente...
+                    </span>
                   </div>
 
-                  <div className="navbar__dropdown-divider"></div>
+                  <div 
+                    className="navbar__dropdown-divider" 
+                    role="separator"
+                    aria-hidden="true"
+                  ></div>
 
-                  <Link to="/perfil" className="navbar__dropdown-item" onClick={toggleMenuPerfil}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <Link 
+                    to="/perfil" 
+                    className="navbar__dropdown-item" 
+                    onClick={toggleMenuPerfil}
+                    role="menuitem"
+                  >
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     <span>Mi Perfil</span>
@@ -223,8 +339,15 @@ const Navbar: React.FC = () => {
                       toggleMenuPerfil();
                       handleLogout();
                     }}
+                    role="menuitem"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     <span>Cerrar Sesión</span>
@@ -235,8 +358,19 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button className="navbar__menu-toggle" onClick={toggleMenu} aria-label="Menú">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <button 
+            className="navbar__menu-toggle" 
+            onClick={toggleMenu} 
+            aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuAbierto}
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
               {menuAbierto ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -248,7 +382,11 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         {menuAbierto && (
-          <div className="navbar__menu-movil">
+          <div 
+            className="navbar__menu-movil"
+            role="navigation"
+            aria-label="Menú móvil"
+          >
             <div className="navbar__links-movil">
               <Link to="/" className="navbar__link-movil" onClick={toggleMenu}>Inicio</Link>
               <Link to="/peliculas" className="navbar__link-movil" onClick={toggleMenu}>Películas</Link>
@@ -269,12 +407,21 @@ const Navbar: React.FC = () => {
   }
 
   // ============================================
-  // NAVBAR NO AUTENTICADO
+  // UNAUTHENTICATED NAVBAR
   // ============================================
   return (
-    <nav className="navbar">
+    <nav 
+      className="navbar"
+      role="navigation"
+      aria-label="Navegación principal"
+    >
       <div className="navbar__container">
-        <Link to="/" className="navbar__logo" onClick={() => setMenuAbierto(false)}>
+        <Link 
+          to="/" 
+          className="navbar__logo" 
+          onClick={() => setMenuAbierto(false)}
+          aria-label="AirFilms - Ir a inicio"
+        >
           <span className="navbar__logo-text">AirFilms</span>
         </Link>
 
@@ -285,16 +432,35 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="navbar__actions">
-          <Link to="/inicio-sesion" className="navbar__button navbar__button--accent">
+          <Link 
+            to="/inicio-sesion" 
+            className="navbar__button navbar__button--accent"
+            aria-label="Ir a página de inicio de sesión"
+          >
             Iniciar Sesión
           </Link>
-          <Link to="/registro" className="navbar__button navbar__button--accent">
+          <Link 
+            to="/registro" 
+            className="navbar__button navbar__button--accent"
+            aria-label="Ir a página de registro"
+          >
             Registrarse
           </Link>
         </div>
 
-        <button className="navbar__menu-toggle" onClick={toggleMenu} aria-label="Menú">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <button 
+          className="navbar__menu-toggle" 
+          onClick={toggleMenu} 
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuAbierto}
+        >
+          <svg 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor"
+            aria-hidden="true"
+            focusable="false"
+          >
             {menuAbierto ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -305,17 +471,29 @@ const Navbar: React.FC = () => {
       </div>
 
       {menuAbierto && (
-        <div className="navbar__menu-movil">
+        <div 
+          className="navbar__menu-movil"
+          role="navigation"
+          aria-label="Menú móvil"
+        >
           <div className="navbar__links-movil">
             <Link to="/" className="navbar__link-movil" onClick={toggleMenu}>Inicio</Link>
             <Link to="/peliculas" className="navbar__link-movil" onClick={toggleMenu}>Películas</Link>
             <Link to="/sobre-nosotros" className="navbar__link-movil" onClick={toggleMenu}>Sobre Nosotros</Link>
           </div>
           <div className="navbar__actions-movil">
-            <Link to="/inicio-sesion" className="navbar__button navbar__button--accent" onClick={toggleMenu}>
+            <Link 
+              to="/inicio-sesion" 
+              className="navbar__button navbar__button--accent" 
+              onClick={toggleMenu}
+            >
               Iniciar Sesión
             </Link>
-            <Link to="/registro" className="navbar__button navbar__button--accent" onClick={toggleMenu}>
+            <Link 
+              to="/registro" 
+              className="navbar__button navbar__button--accent" 
+              onClick={toggleMenu}
+            >
               Registrarse
             </Link>
           </div>

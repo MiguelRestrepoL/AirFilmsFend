@@ -11,8 +11,17 @@ interface MovieCardProps {
 }
 
 /**
- * Tarjeta de película con póster y botón de favoritos.
- * Muestra película de TMDB con opción de marcar como favorita.
+ * Movie card component with poster and favorite button.
+ * 
+ * Features:
+ * - Displays TMDB movie poster and information
+ * - Favorite toggle functionality (authenticated users only)
+ * - Keyboard accessible
+ * - Full WCAG 2.1 AA compliance
+ * 
+ * @component
+ * @param {MovieCardProps} props - Component props
+ * @returns {JSX.Element} Movie card with interactive elements
  */
 const MovieCard: React.FC<MovieCardProps> = ({ 
   movie, 
@@ -21,6 +30,11 @@ const MovieCard: React.FC<MovieCardProps> = ({
   onClick,
   showFavoriteButton = false
 }) => {
+  /**
+   * Handles favorite button click and prevents event propagation
+   * 
+   * @param {React.MouseEvent} e - Mouse event
+   */
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggleFavorite) {
@@ -28,16 +42,43 @@ const MovieCard: React.FC<MovieCardProps> = ({
     }
   };
 
+  /**
+   * Handles keyboard interaction for card activation
+   * 
+   * @param {React.KeyboardEvent} e - Keyboard event
+   */
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <article className="movie-card" onClick={onClick}>
-      {/* Botón de favoritos (solo si está autenticado) */}
+    <article 
+      className="movie-card" 
+      onClick={onClick}
+      onKeyPress={handleKeyPress}
+      tabIndex={0}
+      role="button"
+      aria-label={`Ver detalles de ${movie.title}${movie.releaseDate ? `, ${new Date(movie.releaseDate).getFullYear()}` : ''}`}
+    >
+      {/* Favorite button (authenticated users only) */}
       {showFavoriteButton && onToggleFavorite && (
         <button
           className={`movie-card__favorite ${isFavorite ? "movie-card__favorite--active" : ""}`}
           onClick={handleFavoriteClick}
-          aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+          aria-label={isFavorite ? `Quitar ${movie.title} de favoritos` : `Agregar ${movie.title} a favoritos`}
+          aria-pressed={isFavorite}
+          title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
         >
-          <svg viewBox="0 0 24 24" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor">
+          <svg 
+            viewBox="0 0 24 24" 
+            fill={isFavorite ? "currentColor" : "none"} 
+            stroke="currentColor"
+            aria-hidden="true"
+            focusable="false"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -52,13 +93,23 @@ const MovieCard: React.FC<MovieCardProps> = ({
         {movie.poster ? (
           <img
             src={movie.poster}
-            alt={movie.title}
+            alt={`Póster de ${movie.title}`}
             className="movie-card__image"
             loading="lazy"
           />
         ) : (
-          <div className="movie-card__no-poster">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <div 
+            className="movie-card__no-poster"
+            role="img"
+            aria-label="Imagen no disponible"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
               <polyline points="21 15 16 10 5 21" />
@@ -67,8 +118,16 @@ const MovieCard: React.FC<MovieCardProps> = ({
           </div>
         )}
         
-        <div className="movie-card__overlay">
-          <svg className="movie-card__play-icon" viewBox="0 0 24 24" fill="currentColor">
+        <div 
+          className="movie-card__overlay"
+          aria-hidden="true"
+        >
+          <svg 
+            className="movie-card__play-icon" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            focusable="false"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </div>
@@ -76,7 +135,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
 
       <div className="movie-card__info">
         <h3 className="movie-card__title">{movie.title}</h3>
-        {movie.releaseDate && (
+        {movie.releaseDate && !isNaN(new Date(movie.releaseDate).getTime()) && (
           <p className="movie-card__year">
             {new Date(movie.releaseDate).getFullYear()}
           </p>

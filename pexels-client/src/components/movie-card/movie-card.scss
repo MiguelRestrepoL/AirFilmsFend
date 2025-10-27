@@ -5,10 +5,24 @@
   background: #1a1a1a;
   transition: all 0.3s ease;
   position: relative;
+  border: 2px solid transparent;
+
+  // ✅ WCAG: Clear focus indicator
+  &:focus {
+    outline: 3px solid #64b5f6;
+    outline-offset: 2px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #64b5f6;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+  }
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 10px 30px rgba(255, 87, 34, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
+    border-color: rgba(255, 87, 34, 0.3);
 
     .movie-card__overlay {
       opacity: 1;
@@ -19,10 +33,15 @@
     }
   }
 
+  
+  &:active {
+    transform: translateY(-4px);
+  }
+
   &__image-container {
     position: relative;
     width: 100%;
-    padding-bottom: 150%; // Aspect ratio para póster de película (2:3)
+    padding-bottom: 150%;
     overflow: hidden;
     background: #2a2a2a;
   }
@@ -36,7 +55,7 @@
     object-fit: cover;
   }
 
-  &__no-image {
+  &__no-poster {
     position: absolute;
     top: 0;
     left: 0;
@@ -47,15 +66,18 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    color: #666;
+    color: #999;
+    background: #252525;
 
     svg {
       width: 60px;
       height: 60px;
+      stroke: #666;
     }
 
     span {
       font-size: 0.875rem;
+      font-weight: 500;
     }
   }
 
@@ -65,30 +87,31 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
   }
 
   &__play-icon {
     width: 60px;
     height: 60px;
-    color: #ff5722;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    color: #ff7043;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
   }
 
   &__favorite {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 40px;
-    height: 40px;
-    background: rgba(0, 0, 0, 0.7);
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 44px; // ✅ WCAG: Minimum touch target
+    height: 44px;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -100,32 +123,59 @@
     color: white;
 
     svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
+    }
+
+
+    &:focus {
+      outline: 3px solid #ffd54f;
+      outline-offset: 2px;
+      opacity: 1;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #ffd54f;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(255, 193, 7, 0.2);
+      opacity: 1;
     }
 
     &:hover {
-      background: rgba(255, 87, 34, 0.9);
-      transform: scale(1.1);
+      background: rgba(255, 87, 34, 0.95);
+      transform: scale(1.15);
+      border-color: #ff5722;
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
 
     &--active {
       opacity: 1;
-      background: rgba(255, 87, 34, 0.9);
-      color: #ff5722;
+      background: rgba(255, 193, 7, 0.95);
+      color: #000000;
+      border-color: #ffc107;
+
+      svg {
+        fill: #000000;
+        stroke: #000000;
+      }
 
       &:hover {
-        background: rgba(255, 87, 34, 1);
+        background: #ffc107;
+        transform: scale(1.15);
       }
     }
   }
 
   &__info {
     padding: 1rem;
+    background: #1a1a1a;
   }
 
   &__title {
-    color: white;
+    color: #e0e0e0;
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
@@ -138,21 +188,68 @@
   }
 
   &__year {
-    color: #999;
+    color: #999; 
     font-size: 0.875rem;
     margin: 0;
+    font-weight: 500;
   }
 }
 
-// Responsive
+
 @media (max-width: 768px) {
   .movie-card {
     &__favorite {
-      opacity: 1; // Siempre visible en móvil
+      opacity: 1;
+      width: 44px;
+      height: 44px;
     }
 
     &:hover {
       transform: translateY(-4px);
     }
+
+
+    &:focus-visible {
+      outline-width: 4px;
+    }
+  }
+}
+
+
+@media (prefers-contrast: high) {
+  .movie-card {
+    border-width: 3px;
+
+    &:focus-visible {
+      outline-width: 4px;
+    }
+
+    &__favorite {
+      border-width: 3px;
+
+      &:focus-visible {
+        outline-width: 4px;
+      }
+    }
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .movie-card,
+  .movie-card__overlay,
+  .movie-card__favorite,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .movie-card:hover {
+    transform: none;
+  }
+
+  .movie-card__favorite:hover {
+    transform: none;
   }
 }
