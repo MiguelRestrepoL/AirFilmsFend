@@ -152,7 +152,7 @@ const PeliculasPage: React.FC = () => {
   /**
    * Muestra las películas favoritas del usuario
    */
-  const showFavorites = () => {
+  const showFavorites = async () => {
     if (!isAuthenticated) {
       alert("Debes iniciar sesión para ver tus favoritos");
       return;
@@ -160,16 +160,39 @@ const PeliculasPage: React.FC = () => {
 
     setShowingFavorites(true);
     setActiveFilter("favorites");
+    setIsLoading(true);
     
-    // Convertir favoritos a formato Movie[]
-    const favMovies: Movie[] = favorites.map(fav => ({
-      id: fav.movieId,
-      title: fav.movieName,
-      poster: fav.posterURL || null,
-      releaseDate: undefined
-    }));
-    
-    setMovies(favMovies);
+    try {
+      // Cargar detalles completos de cada favorito
+      const favMoviesPromises = favorites.map(async (fav) => {
+        try {
+          const details = await servicioPeliculas.obtenerDetalles(fav.movieId);
+          return {
+            id: details.id,
+            title: details.title,
+            poster: details.poster,
+            releaseDate: details.releaseDate
+          };
+        } catch (error) {
+          console.error(`Error cargando detalles de película ${fav.movieId}:`, error);
+          // Si falla, usar datos básicos del favorito
+          return {
+            id: fav.movieId,
+            title: fav.movieName,
+            poster: fav.posterURL || null,
+            releaseDate: undefined
+          };
+        }
+      });
+      
+      const favMovies = await Promise.all(favMoviesPromises);
+      setMovies(favMovies);
+    } catch (error) {
+      console.error("Error al cargar favoritos:", error);
+      alert("Error al cargar los detalles de tus favoritos");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /**
