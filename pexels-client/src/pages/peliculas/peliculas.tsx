@@ -18,6 +18,9 @@ const GENRES: Genre[] = [
   { id: "27", name: "Terror", tmdbId: "27" },
   { id: "10749", name: "Romance", tmdbId: "10749" },
   { id: "16", name: "Animación", tmdbId: "16" },
+  { id: "53", name: "Thriller", tmdbId: "53" },
+  { id: "12", name: "Aventura", tmdbId: "12" },
+  { id: "14", name: "Fantasía", tmdbId: "14" },
 ];
 
 /**
@@ -36,16 +39,26 @@ const PeliculasPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("popular");
   const [favorites, setFavorites] = useState<MovieFavorite[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showingFavorites, setShowingFavorites] = useState(false); // ✨ NUEVO
+  const [showingFavorites, setShowingFavorites] = useState(false);
 
-  // Verificar autenticación
+  // Verificar autenticación al cargar
   useEffect(() => {
     const token = localStorage.getItem("airfilms_token");
     setIsAuthenticated(!!token);
+  }, []);
 
-    if (token) {
+  // Cargar favoritos cuando hay autenticación
+  useEffect(() => {
+    if (isAuthenticated) {
       loadFavorites();
+    } else {
+      setFavorites([]);
     }
+  }, [isAuthenticated]);
+
+  // Cargar películas populares al iniciar
+  useEffect(() => {
+    loadPopularMovies();
   }, []);
 
   /**
@@ -57,15 +70,11 @@ const PeliculasPage: React.FC = () => {
       setFavorites(data);
     } catch (err) {
       console.error("Error al cargar favoritos:", err);
+      // Si falla, probablemente el token expiró
+      setIsAuthenticated(false);
+      setFavorites([]);
     }
   };
-
-  /**
-   * Carga películas populares al iniciar
-   */
-  useEffect(() => {
-    loadPopularMovies();
-  }, []);
 
   /**
    * Busca películas por nombre
@@ -74,10 +83,11 @@ const PeliculasPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
+      setShowingFavorites(false);
       
       const response = await servicioPeliculas.buscarPorNombre(query);
       setMovies(response.results);
-      setActiveFilter(query);
+      setActiveFilter(`search:${query}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -92,6 +102,7 @@ const PeliculasPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
+      setShowingFavorites(false);
       
       const response = await servicioPeliculas.obtenerPopulares(1);
       setMovies(response.results);
@@ -110,6 +121,7 @@ const PeliculasPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
+      setShowingFavorites(false);
       
       const response = await servicioPeliculas.buscarPorGenero(genreId);
       setMovies(response.results);
@@ -119,6 +131,29 @@ const PeliculasPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * Muestra las películas favoritas del usuario
+   */
+  const showFavorites = () => {
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para ver tus favoritos");
+      return;
+    }
+
+    setShowingFavorites(true);
+    setActiveFilter("favorites");
+    
+    // Convertir favoritos a formato Movie[]
+    const favMovies: Movie[] = favorites.map(fav => ({
+      id: fav.movieId,
+      title: fav.movieName,
+      poster: fav.posterURL || null,
+      releaseDate: undefined
+    }));
+    
+    setMovies(favMovies);
   };
 
   /**
@@ -137,9 +172,27 @@ const PeliculasPage: React.FC = () => {
         // Eliminar de favoritos
         await servicioFavoritos.eliminarFavorito(movieId);
         setFavorites(favorites.filter(fav => fav.movieId !== movieId));
+        
+        // Si estamos viendo favoritos, actualizar la vista
+        if (showingFavorites) {
+          setMovies(movies.filter(m => m.id !== movieId));
+        }
       } else {
-        // Agregar a favoritos
-        const newFavorite = await servicioFavoritos.agregarFavorito(movieId);
+        // ✅ BUSCAR LA PELÍCULA COMPLETA para tener nombre y poster
+        const movie = movies.find(m => m.id === movieId);
+        
+        if (!movie) {
+          console.error("Película no encontrada en la lista actual");
+          return;
+        }
+
+        // ✅ AGREGAR con todos los datos necesarios
+        const newFavorite = await servicioFavoritos.agregarFavorito({
+          movieId: movie.id,
+          movieName: movie.title,
+          posterURL: movie.poster || "" // Backend requiere string, no null
+        });
+        
         setFavorites([...favorites, newFavorite]);
       }
     } catch (err: any) {
@@ -147,7 +200,7 @@ const PeliculasPage: React.FC = () => {
       alert(err.message || "Error al actualizar favoritos");
       
       // Si es error de sesión, recargar favoritos
-      if (err.message.includes("Sesión expirada")) {
+      if (err.message.includes("Sesión expirada") || err.message.includes("Token")) {
         setIsAuthenticated(false);
         setFavorites([]);
       }
@@ -166,6 +219,16 @@ const PeliculasPage: React.FC = () => {
       <div className="movie-page__header">
         <h1 className="movie-page__title">Películas</h1>
         <SearchBar alBuscar={searchMovies} marcadorPosicion="Buscar películas..." />
+        
+        {/* Mensaje para usuarios no autenticados */}
+        {!isAuthenticated && (
+          <div className="movie-page__auth-notice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Inicia sesión para guardar tus películas favoritas</span>
+          </div>
+        )}
       </div>
 
       <div className="movie-page__container">
@@ -177,6 +240,7 @@ const PeliculasPage: React.FC = () => {
           >
             Populares
           </button>
+          
           {GENRES.map((genre) => (
             <button
               key={genre.id}
@@ -186,6 +250,29 @@ const PeliculasPage: React.FC = () => {
               {genre.name}
             </button>
           ))}
+
+          {/* Botón de favoritos - solo visible si está autenticado */}
+          {isAuthenticated && (
+            <button
+              className={`movie-page__filter movie-page__filter--favorites ${activeFilter === "favorites" ? "movie-page__filter--active" : ""}`}
+              onClick={showFavorites}
+            >
+              <svg 
+                viewBox="0 0 24 24" 
+                fill={activeFilter === "favorites" ? "currentColor" : "none"} 
+                stroke="currentColor"
+                style={{ width: "18px", height: "18px", marginRight: "8px" }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                />
+              </svg>
+              Mis Favoritos {favorites.length > 0 && `(${favorites.length})`}
+            </button>
+          )}
         </div>
 
         {error && (
@@ -203,7 +290,11 @@ const PeliculasPage: React.FC = () => {
           <div className="movie-page__grid">
             {movies.length === 0 ? (
               <div className="movie-page__empty">
-                <p>No se encontraron películas.</p>
+                {showingFavorites ? (
+                  <p>No tienes películas favoritas aún. ¡Agrega algunas con la estrella! ⭐</p>
+                ) : (
+                  <p>No se encontraron películas.</p>
+                )}
               </div>
             ) : (
               movies.map((movie) => (
