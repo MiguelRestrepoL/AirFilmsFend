@@ -28,7 +28,6 @@ const Navbar: React.FC = () => {
 
       if (token) {
         try {
-          // Verificar token con el backend
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
           
           // Verificar token
