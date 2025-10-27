@@ -24,82 +24,45 @@ const HomePage: React.FC = () => {
   /**
    * Verifica autenticación y carga datos del usuario
    */
+  /**
+   * Verifica autenticación y carga datos del usuario
+   */
   useEffect(() => {
     const verificarAutenticacion = async () => {
       try {
-        const token = localStorage.getItem("airfilms_token"); // ← Cambiado a airfilms_token
+        const token = localStorage.getItem("authToken");
         
         console.log("🔍 Verificando token:", token ? "✅ Token encontrado" : "❌ No hay token");
         
         if (token) {
-          // Verificar token con el backend
+          setEstaAutenticado(true);
+          
+          // Intentar obtener datos del usuario
           const apiUrl = import.meta.env.VITE_API_URL || "https://airfilms-server.onrender.com/api";
           
-          console.log("📡 Verificando token con:", `${apiUrl}/auth/verify-auth`);
-          
           try {
-            const response = await fetch(`${apiUrl}/auth/verify-auth`, {
+            const profileResponse = await fetch(`${apiUrl}/users/profile`, {
               headers: {
                 "Authorization": `Bearer ${token}`
               }
             });
 
-            console.log("📥 Respuesta verify-auth:", response.status);
-
-            if (response.ok) {
-              const data = await response.json();
-              console.log("✅ Token válido:", data);
+            if (profileResponse.ok) {
+              const profileData = await profileResponse.json();
+              console.log("👤 Datos de perfil:", profileData);
               
-              if (data.success) {
-                // Token válido, ahora obtenemos el perfil
-                try {
-                  const profileResponse = await fetch(`${apiUrl}/users/profile`, {
-                    headers: {
-                      "Authorization": `Bearer ${token}`
-                    }
-                  });
-
-                  console.log("📥 Respuesta perfil:", profileResponse.status);
-
-                  if (profileResponse.ok) {
-                    const profileData = await profileResponse.json();
-                    console.log("👤 Datos de perfil:", profileData);
-                    
-                    if (profileData.success && profileData.user) {
-                      setUsuario(profileData.user);
-                      setEstaAutenticado(true);
-                      console.log("✅ Usuario autenticado:", profileData.user.name);
-                    } else {
-                      // Si no hay perfil pero el token es válido, igual autenticamos
-                      setEstaAutenticado(true);
-                      setUsuario({ name: "Usuario" });
-                      console.log("⚠️ Token válido pero sin perfil completo");
-                    }
-                  } else {
-                    console.warn("⚠️ Error al obtener perfil, pero token es válido");
-                    setEstaAutenticado(true);
-                    setUsuario({ name: "Usuario" });
-                  }
-                } catch (profileErr) {
-                  console.error("❌ Error al cargar perfil:", profileErr);
-                  setEstaAutenticado(true);
-                  setUsuario({ name: "Usuario" });
-                }
+              if (profileData.success && profileData.user) {
+                setUsuario(profileData.user);
+                console.log("✅ Usuario autenticado:", profileData.user.name);
               } else {
-                console.warn("❌ Token inválido, eliminando...");
-                setEstaAutenticado(false);
-                localStorage.removeItem("airfilms_token"); // ← Cambiado
+                setUsuario({ name: "Usuario" });
               }
             } else {
-              console.warn("❌ Token inválido (status " + response.status + "), eliminando...");
-              setEstaAutenticado(false);
-              localStorage.removeItem("airfilms_token"); // ← Cambiado
+              console.warn("⚠️ Error al obtener perfil");
+              setUsuario({ name: "Usuario" });
             }
-          } catch (err) {
-            console.error("❌ Error al verificar token:", err);
-            // Si hay error de red pero tenemos token, asumimos autenticado temporalmente
-            console.log("⚠️ Error de red, manteniendo sesión temporal");
-            setEstaAutenticado(true);
+          } catch (profileErr) {
+            console.error("❌ Error al cargar perfil:", profileErr);
             setUsuario({ name: "Usuario" });
           }
         } else {
@@ -110,7 +73,7 @@ const HomePage: React.FC = () => {
         console.error("❌ Error general en verificación:", error);
         setEstaAutenticado(false);
       } finally {
-        console.log("✅ Verificación completada, estaCargando = false");
+        console.log("✅ Verificación completada");
         setEstaCargando(false);
       }
     };
@@ -119,7 +82,7 @@ const HomePage: React.FC = () => {
 
     // Escuchar cambios en localStorage (cuando se hace login/logout en otra pestaña)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "airfilms_token") { // ← Cambiado
+      if (e.key === "authToken") {
         console.log("🔄 Token cambió en localStorage, re-verificando...");
         verificarAutenticacion();
       }
@@ -214,7 +177,6 @@ const HomePage: React.FC = () => {
               >
                 Explorar Películas
               </button>
-              
             </div>
           </div>
         </section>
