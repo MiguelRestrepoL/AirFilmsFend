@@ -54,6 +54,8 @@ export const servicioFavoritos = {
    */
   obtenerHeaders() {
     const token = this.obtenerToken();
+    console.log("🔑 Token para favoritos:", token ? `${token.substring(0, 20)}...` : "❌ NO HAY TOKEN");
+    
     if (!token) {
       throw new Error("No hay sesión activa. Inicia sesión para continuar.");
     }
@@ -140,6 +142,8 @@ export const servicioFavoritos = {
    */
   async obtenerFavoritos(): Promise<MovieFavorite[]> {
     try {
+      console.log("📡 Llamando a:", `${API_BASE_URL}/movies/get-favorites`);
+      
       const response = await axios.get<GetFavoritesResponse>(
         `${API_BASE_URL}/movies/get-favorites`,
         {
@@ -147,16 +151,35 @@ export const servicioFavoritos = {
         }
       );
 
+      console.log("✅ Respuesta favoritos:", response.status, response.data);
+
       if (!response.data.success) {
         throw new Error("Error al obtener favoritos");
       }
 
       return response.data.favorites || [];
     } catch (error: any) {
-      console.error("Error al obtener favoritos:", error);
+      console.error("❌ Error completo:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // Si es 404, la ruta no existe o el servidor está apagado
+      if (error.response?.status === 404) {
+        console.error("❌ RUTA NO ENCONTRADA (404): Verifica que el backend esté corriendo");
+        return []; // Retornar array vacío en lugar de error
+      }
       
       if (error.response?.status === 401 || error.response?.status === 403) {
         throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
+      }
+      
+      // Si no hay respuesta del servidor
+      if (!error.response) {
+        console.error("❌ SIN RESPUESTA DEL SERVIDOR: El backend puede estar apagado");
+        return [];
       }
       
       throw new Error(
@@ -174,5 +197,3 @@ export const servicioFavoritos = {
     return favorites.some(fav => fav.movieId === movieId);
   }
 };
-
-export default servicioFavoritos;

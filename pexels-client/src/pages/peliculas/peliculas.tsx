@@ -3,7 +3,7 @@ import SearchBar from "../../components/search-bar/search-bar";
 import MovieCard from "../../components/movie-card/movie-card";
 import MovieModal from "../../components/movie-modal/movie-modal";
 import servicioPeliculas from "../../services/peliculas.servicio";
-import servicioFavoritos from "../../services/favoritos.servicio";
+import { servicioFavoritos } from "../../services/favoritos.servicio";
 import type { Movie, MovieFavorite, Genre } from "../../types/movies.types";
 import "./peliculas.scss";
 
@@ -43,8 +43,24 @@ const PeliculasPage: React.FC = () => {
 
   // Verificar autenticación al cargar
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    setIsAuthenticated(!!token);
+    const verificarAuth = () => {
+      const token = localStorage.getItem("authToken");
+      console.log("🔍 [PELÍCULAS] Verificando auth:", token ? `✅ Token encontrado: ${token.substring(0, 20)}...` : "❌ Sin token");
+      setIsAuthenticated(!!token);
+    };
+
+    verificarAuth();
+
+    // Escuchar cambios de autenticación en otras pestañas
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "authToken") {
+        console.log("🔄 [PELÍCULAS] Token cambió en localStorage");
+        verificarAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Cargar favoritos cuando hay autenticación
