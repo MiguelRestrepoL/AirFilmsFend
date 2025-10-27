@@ -43,7 +43,7 @@ const PeliculasPage: React.FC = () => {
 
   // Verificar autenticación al cargar
   useEffect(() => {
-    const token = localStorage.getItem("airfilms_token");
+    const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
   }, []);
 
@@ -178,7 +178,7 @@ const PeliculasPage: React.FC = () => {
           setMovies(movies.filter(m => m.id !== movieId));
         }
       } else {
-        // ✅ BUSCAR LA PELÍCULA COMPLETA para tener nombre y poster
+        // Buscar la película completa para tener nombre y poster
         const movie = movies.find(m => m.id === movieId);
         
         if (!movie) {
@@ -186,11 +186,11 @@ const PeliculasPage: React.FC = () => {
           return;
         }
 
-        // ✅ AGREGAR con todos los datos necesarios
+        // Agregar con todos los datos necesarios
         const newFavorite = await servicioFavoritos.agregarFavorito({
           movieId: movie.id,
           movieName: movie.title,
-          posterURL: movie.poster || "" // Backend requiere string, no null
+          posterURL: movie.poster || ""
         });
         
         setFavorites([...favorites, newFavorite]);

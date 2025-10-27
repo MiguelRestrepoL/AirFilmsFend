@@ -46,7 +46,7 @@ export const servicioFavoritos = {
    * Obtiene el token de autenticación del localStorage
    */
   obtenerToken(): string | null {
-    return localStorage.getItem("airfilms_token");
+    return localStorage.getItem("authToken");
   },
 
   /**
