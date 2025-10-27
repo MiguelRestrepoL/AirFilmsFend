@@ -197,3 +197,5 @@ export const servicioFavoritos = {
     return favorites.some(fav => fav.movieId === movieId);
   }
 };
+
+export default servicioFavoritos;   
