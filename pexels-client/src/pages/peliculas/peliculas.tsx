@@ -293,10 +293,45 @@ const PeliculasPage: React.FC = () => {
     <div className="movie-page">
       <div className="movie-page__header">
         <h1 className="movie-page__title">Películas</h1>
-        <SearchBar 
-          alBuscar={searchMovies} 
-          marcadorPosicion="Buscar películas..." 
-        />
+        
+        {/* ✅ NUEVA SECCIÓN: Barra de búsqueda + Botón Mis Favoritos */}
+        <div className="movie-page__search-section">
+          <SearchBar 
+            alBuscar={searchMovies} 
+            marcadorPosicion="Buscar películas..." 
+          />
+          
+          {/* Botón Mis Favoritos (solo si está autenticado) */}
+          {isAuthenticated && (
+            <button
+              className={`movie-page__favorites-btn ${activeFilter === "favorites" ? "movie-page__favorites-btn--active" : ""}`}
+              onClick={showFavorites}
+              aria-pressed={activeFilter === "favorites"}
+              aria-label={`Mostrar mis favoritos${favorites.length > 0 ? `, ${favorites.length} películas` : ''}`}
+              title="Ver mis favoritos"
+            >
+              <svg 
+                viewBox="0 0 24 24" 
+                fill={activeFilter === "favorites" ? "currentColor" : "none"} 
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              {favorites.length > 0 && (
+                <span className="movie-page__favorites-count">
+                  {favorites.length}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
         
         {/* Authentication notice for non-authenticated users */}
         {!isAuthenticated && (
@@ -351,35 +386,6 @@ const PeliculasPage: React.FC = () => {
               {genre.name}
             </button>
           ))}
-
-          {/* Favorites button - visible only when authenticated */}
-          {isAuthenticated && (
-            <button
-              className={`movie-page__filter movie-page__filter--favorites ${activeFilter === "favorites" ? "movie-page__filter--active" : ""}`}
-              onClick={showFavorites}
-              aria-pressed={activeFilter === "favorites"}
-              aria-label={`Mostrar mis favoritos${favorites.length > 0 ? `, ${favorites.length} películas` : ''}`}
-            >
-              <svg 
-                viewBox="0 0 24 24" 
-                fill={activeFilter === "favorites" ? "currentColor" : "none"} 
-                stroke="currentColor"
-                style={{ width: "18px", height: "18px", marginRight: "8px" }}
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                />
-              </svg>
-              <span>
-                Mis Favoritos {favorites.length > 0 && `(${favorites.length})`}
-              </span>
-            </button>
-          )}
         </nav>
 
         {/* Error message */}
@@ -420,7 +426,7 @@ const PeliculasPage: React.FC = () => {
                 aria-live="polite"
               >
                 {showingFavorites ? (
-                  <p>No tienes películas favoritas aún. ¡Agrega algunas con la estrella! ⭐</p>
+                  <p>No tienes películas favoritas aún. ¡Agrega algunas con el corazón! ❤️</p>
                 ) : (
                   <p>No se encontraron películas.</p>
                 )}
