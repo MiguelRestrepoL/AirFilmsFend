@@ -174,7 +174,7 @@ const EliminarPerfil: React.FC = () => {
       <div className="eliminar-perfil__container">
         <header className="eliminar-perfil__logo-header">
           <img 
-            src="/airfilms.png" 
+            src="/AirFilms.png" 
             alt="AirFilms" 
             className="eliminar-perfil__logo"
           />
