@@ -38,7 +38,7 @@ interface ProtectedRouteProps {
  * </ProtectedRoute>
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const token = localStorage.getItem("airfilms_token");
+  const token = localStorage.getItem("authToken");
 
   if (!token) {
     return <Navigate to="/inicio-sesion" replace />;
