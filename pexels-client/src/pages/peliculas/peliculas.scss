@@ -30,7 +30,7 @@
     margin: 0 auto;
   }
 
-  // ✅ BOTÓN DE MIS FAVORITOS (estilo igual a los filtros de género)
+  // ✅ BOTÓN DE MIS FAVORITOS (estilo amarillo igual a los filtros)
   &__favorites-btn {
     position: relative;
     background: rgba(60, 60, 60, 0.8); 
@@ -38,7 +38,6 @@
     color: #ffffff; 
     padding: 0.75rem 1.5rem;
     min-height: 44px; 
-    min-width: 44px;
     border-radius: 25px;
     font-weight: 600;
     font-size: 0.95rem;
@@ -54,6 +53,7 @@
     svg {
       width: 20px;
       height: 20px;
+      flex-shrink: 0;
     }
 
     // WCAG: Clear focus indicator
@@ -90,25 +90,26 @@
         fill: white;
         stroke: white;
       }
+
+      .movie-page__favorites-text {
+        color: #ffffff;
+      }
+
+      .movie-page__favorites-count {
+        color: #ffffff;
+      }
     }
   }
 
+  &__favorites-text {
+    font-weight: 600;
+    color: #ffffff;
+  }
+
   &__favorites-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff5722;
-    color: white;
-    font-size: 0.75rem;
     font-weight: 700;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 6px;
-    border: 2px solid #0a0a0a;
+    color: #ffffff;
+    margin-left: -0.25rem;
   }
 
   &__container {
@@ -331,10 +332,6 @@
 
     &__error,
     &__auth-notice {
-      border-width: 3px;
-    }
-
-    &__favorites-count {
       border-width: 3px;
     }
   }

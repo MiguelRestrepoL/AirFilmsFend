@@ -301,7 +301,7 @@ const PeliculasPage: React.FC = () => {
             marcadorPosicion="Buscar películas..." 
           />
           
-          {/* Botón Mis Favoritos (solo si está autenticado) */}
+          {/* Botón Mis Favoritos con texto visible (solo si está autenticado) */}
           {isAuthenticated && (
             <button
               className={`movie-page__favorites-btn ${activeFilter === "favorites" ? "movie-page__favorites-btn--active" : ""}`}
@@ -324,9 +324,10 @@ const PeliculasPage: React.FC = () => {
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
               </svg>
+              <span className="movie-page__favorites-text">Mis Favoritos</span>
               {favorites.length > 0 && (
                 <span className="movie-page__favorites-count">
-                  {favorites.length}
+                  ({favorites.length})
                 </span>
               )}
             </button>
