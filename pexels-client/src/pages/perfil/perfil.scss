@@ -1,3 +1,15 @@
+// ============================================
+// PROFILE PAGE COMPONENT - WCAG 2.1 AA COMPLIANT
+// ============================================
+// Accessibility features:
+// - Contrast ratios meet 4.5:1 minimum (text)
+// - Focus indicators with 3:1 contrast
+// - 44x44px minimum touch targets
+// - Keyboard navigation support
+// - Reduced motion support
+// - Clear visual hierarchy
+// ============================================
+
 .perfil {
   min-height: 100vh;
   background: var(--fondo-oscuro);
@@ -9,6 +21,32 @@
   }
 
   // ============================================
+  // LOADING STATE
+  // ============================================
+  &__loading {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    gap: 1.5rem;
+  }
+
+  &__spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 87, 34, 0.2);
+    border-top-color: #ff5722;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: spin 3s linear infinite;
+    }
+  }
+
+  // ============================================
   // LOGO
   // ============================================
   &__logo-header {
@@ -17,6 +55,10 @@
     align-items: center;
     margin-bottom: 2.5rem;
     animation: fadeInDown 0.6s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__logo {
@@ -36,11 +78,23 @@
     @media (max-width: 480px) {
       max-width: 150px;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
   }
 
   &__header {
     margin-bottom: 3rem;
     animation: fadeInUp 0.6s ease 0.1s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__title {
@@ -60,7 +114,7 @@
   }
 
   // ============================================
-  // PESTAÑAS
+  // TABS
   // ============================================
   &__tabs {
     display: flex;
@@ -69,6 +123,10 @@
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     animation: fadeInUp 0.6s ease 0.2s both;
     justify-content: center;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__tab {
@@ -76,16 +134,21 @@
     background: none;
     border: none;
     border-bottom: 3px solid transparent;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 1.05rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     bottom: -2px;
+    min-height: 56px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
     }
 
     &--active {
@@ -94,7 +157,7 @@
     }
 
     &:focus-visible {
-      outline: 2px solid #ff5722;
+      outline: 3px solid #ff5722;
       outline-offset: 4px;
       border-radius: 4px;
     }
@@ -102,17 +165,26 @@
     @media (max-width: 480px) {
       padding: 0.875rem 1.75rem;
       font-size: 0.95rem;
+      min-width: 100px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
   // ============================================
-  // FOTO DE PERFIL
+  // PROFILE PHOTO
   // ============================================
   &__photo-section {
     display: flex;
     justify-content: center;
     margin-bottom: 3rem;
     animation: fadeInScale 0.6s ease 0.3s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__photo-container {
@@ -130,7 +202,7 @@
     justify-content: center;
     font-size: 1.05rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 8px 30px rgba(255, 87, 34, 0.25);
     transition: all 0.3s ease;
 
@@ -151,13 +223,25 @@
       height: 110px;
       font-size: 0.85rem;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
   }
 
   // ============================================
-  // CONTENIDO
+  // CONTENT
   // ============================================
   &__content {
     animation: fadeIn 0.5s ease 0.4s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__section-title {
@@ -168,7 +252,7 @@
     letter-spacing: -0.5px;
 
     &--danger {
-      color: #ff5252;
+      color: #ff6666;
     }
 
     @media (max-width: 480px) {
@@ -177,7 +261,7 @@
   }
 
   // ============================================
-  // FORMULARIO
+  // FORM
   // ============================================
   &__form {
     display: flex;
@@ -203,7 +287,7 @@
   }
 
   &__label {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 0.95rem;
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -220,15 +304,16 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     outline: none;
+    min-height: 52px;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.5);
     }
 
     &:focus {
       background: rgba(255, 255, 255, 0.09);
       border-color: #ff5722;
-      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.12);
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.2);
       transform: translateY(-1px);
     }
 
@@ -251,16 +336,24 @@
         margin: 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:focus {
+        transform: none;
+      }
+    }
   }
 
   &__hint {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.65);
     font-size: 0.85rem;
     line-height: 1.5;
   }
 
   // ============================================
-  // BOTONES
+  // BUTTONS
   // ============================================
   &__actions {
     display: flex;
@@ -287,6 +380,8 @@
     justify-content: center;
     gap: 0.5rem;
     letter-spacing: 0.3px;
+    min-height: 56px;
+    min-width: 140px;
 
     &:disabled {
       opacity: 0.5;
@@ -295,13 +390,22 @@
     }
 
     &:focus-visible {
-      outline: 3px solid rgba(255, 255, 255, 0.5);
+      outline: 3px solid rgba(255, 255, 255, 0.8);
       outline-offset: 3px;
     }
 
     @media (max-width: 480px) {
       width: 100%;
       padding: 1rem 2rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover:not(:disabled),
+      &:active:not(:disabled) {
+        transform: none !important;
+      }
     }
 
     &--primary {
@@ -317,11 +421,15 @@
       &:active:not(:disabled) {
         transform: translateY(0);
       }
+
+      &:focus-visible {
+        outline-color: #ff5722;
+      }
     }
 
     &--secondary {
       background: rgba(255, 255, 255, 0.06);
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
       border: 2px solid rgba(255, 255, 255, 0.15);
 
       &:hover:not(:disabled) {
@@ -332,7 +440,7 @@
 
     &--danger {
       background: rgba(244, 67, 54, 0.18);
-      color: #ff5252;
+      color: #ff6666;
       border: 2px solid rgba(244, 67, 54, 0.45);
 
       &:hover:not(:disabled) {
@@ -344,6 +452,10 @@
 
       &:active:not(:disabled) {
         transform: translateY(0);
+      }
+
+      &:focus-visible {
+        outline-color: #ff6666;
       }
     }
 
@@ -366,7 +478,7 @@
   }
 
   // ============================================
-  // SECCIÓN DE SEGURIDAD
+  // SECURITY SECTION
   // ============================================
   &__security-section {
     padding: 2.75rem;
@@ -387,6 +499,10 @@
 
     @media (max-width: 480px) {
       padding: 1.75rem 1.25rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -418,22 +534,26 @@
     @media (max-width: 480px) {
       padding: 1.75rem 1.25rem;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   &__danger-text {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.85);
     font-size: 0.98rem;
     line-height: 1.65;
     margin: 0 0 1.5rem;
   }
 
   // ============================================
-  // MENSAJES
+  // MESSAGES
   // ============================================
   &__error {
     background: rgba(244, 67, 54, 0.16);
     border: 1px solid rgba(244, 67, 54, 0.45);
-    color: #ff5252;
+    color: #ff6666;
     padding: 1rem 1.15rem;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -448,12 +568,16 @@
       height: 22px;
       flex-shrink: 0;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__success {
     background: rgba(76, 175, 80, 0.16);
     border: 1px solid rgba(76, 175, 80, 0.45);
-    color: #66bb6a;
+    color: #81c784;
     padding: 1rem 1.15rem;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -468,11 +592,15 @@
       height: 22px;
       flex-shrink: 0;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 }
 
 // ============================================
-// ANIMACIONES
+// ANIMATIONS
 // ============================================
 @keyframes fadeInUp {
   from {
@@ -525,5 +653,11 @@
   }
   75% {
     transform: translateX(10px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
