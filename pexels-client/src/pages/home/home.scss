@@ -317,27 +317,28 @@
     margin-bottom: 4rem;
   }
 
-  &__categories-scroll {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-    scroll-snap-type: x mandatory;
+&__categories-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  margin-top: 1.5rem;  
+  scroll-snap-type: x mandatory;
 
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #ff5722;
-      border-radius: 4px;
-    }
+  &::-webkit-scrollbar {
+    height: 8px;
   }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ff5722;
+    border-radius: 4px;
+  }
+}
 
   &__category-card {
     flex-shrink: 0;
