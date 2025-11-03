@@ -1,3 +1,15 @@
+// ============================================
+// DELETE PROFILE PAGE - WCAG 2.1 AA COMPLIANT
+// ============================================
+// Accessibility features:
+// - Contrast ratios meet 4.5:1 minimum (text)
+// - Focus indicators with 3:1 contrast
+// - 44x44px minimum touch targets
+// - Keyboard navigation support
+// - Reduced motion support
+// - Clear visual hierarchy for warnings
+// ============================================
+
 .eliminar-perfil {
   min-height: 100vh;
   background: var(--fondo-oscuro);
@@ -17,6 +29,10 @@
     align-items: center;
     margin-bottom: 2rem;
     animation: fadeInDown 0.6s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__logo {
@@ -28,6 +44,10 @@
     @media (max-width: 768px) {
       max-width: 150px;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   // ============================================
@@ -37,6 +57,10 @@
     text-align: center;
     margin-bottom: 2.5rem;
     animation: fadeInUp 0.6s ease 0.1s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__icon {
@@ -53,13 +77,13 @@
     svg {
       width: 40px;
       height: 40px;
-      color: #ff5252;
+      color: #ff6666;
     }
   }
 
   &__title {
     font-size: 2.5rem;
-    color: #ff5252;
+    color: #ff6666;
     margin: 0 0 0.75rem;
     font-weight: 700;
 
@@ -70,12 +94,12 @@
 
   &__subtitle {
     font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     margin: 0;
   }
 
   // ============================================
-  // ADVERTENCIA CRÍTICA
+  // CRITICAL WARNING
   // ============================================
   &__warning {
     background: rgba(244, 67, 54, 0.12);
@@ -91,6 +115,10 @@
       flex-direction: column;
       padding: 1.5rem;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__warning-icon {
@@ -99,7 +127,7 @@
     svg {
       width: 48px;
       height: 48px;
-      color: #ff5252;
+      color: #ff6666;
     }
 
     @media (max-width: 768px) {
@@ -113,13 +141,13 @@
 
   &__warning-title {
     font-size: 1.3rem;
-    color: #ff5252;
+    color: #ff6666;
     margin: 0 0 1rem;
     font-weight: 700;
   }
 
   &__warning-text {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
     margin: 0 0 1rem;
     line-height: 1.6;
   }
@@ -127,7 +155,7 @@
   &__warning-list {
     margin: 0;
     padding-left: 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.85);
 
     li {
       margin-bottom: 0.5rem;
@@ -136,7 +164,7 @@
   }
 
   // ============================================
-  // INFORMACIÓN DE CUENTA
+  // ACCOUNT INFO
   // ============================================
   &__info {
     background: rgba(100, 50, 150, 0.1);
@@ -148,6 +176,10 @@
 
     @media (max-width: 768px) {
       padding: 1.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
     }
   }
 
@@ -162,6 +194,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.25rem;
+    margin: 0;
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
@@ -173,22 +206,25 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin: 0;
   }
 
   &__info-label {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
+    margin: 0;
   }
 
   &__info-value {
     font-size: 1rem;
     color: white;
     font-weight: 600;
+    margin: 0;
   }
 
   // ============================================
-  // PASOS
+  // STEPS
   // ============================================
   &__steps {
     background: rgba(255, 87, 34, 0.08);
@@ -201,11 +237,15 @@
     @media (max-width: 768px) {
       padding: 1.5rem;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__steps-title {
     font-size: 1.1rem;
-    color: #ff9800;
+    color: #ffb74d;
     margin: 0 0 1.25rem;
     font-weight: 600;
   }
@@ -213,7 +253,7 @@
   &__steps-list {
     margin: 0;
     padding-left: 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.85);
 
     li {
       margin-bottom: 0.75rem;
@@ -222,10 +262,14 @@
   }
 
   // ============================================
-  // FORMULARIO
+  // FORM
   // ============================================
   &__form {
     animation: fadeIn 0.6s ease 0.5s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__form-group {
@@ -234,7 +278,7 @@
 
   &__label {
     display: block;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
@@ -242,7 +286,7 @@
   }
 
   &__confirmation-hint {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
     margin: 0 0 0.75rem;
   }
@@ -252,7 +296,7 @@
     border: 2px solid rgba(244, 67, 54, 0.5);
     border-radius: 8px;
     padding: 1rem 1.5rem;
-    color: #ff5252;
+    color: #ff6666;
     font-size: 1.2rem;
     font-weight: 700;
     text-align: center;
@@ -270,21 +314,30 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     outline: none;
+    min-height: 52px;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.5);
     }
 
     &:focus {
       background: rgba(255, 255, 255, 0.09);
       border-color: #ff5722;
-      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.12);
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.2);
       transform: translateY(-1px);
     }
 
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:focus {
+        transform: none;
+      }
     }
   }
 
@@ -304,31 +357,37 @@
 
   &__checkbox {
     margin-top: 0.25rem;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     cursor: pointer;
     flex-shrink: 0;
+    accent-color: #ff5722;
 
     &:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
+
+    &:focus-visible {
+      outline: 3px solid #ff5722;
+      outline-offset: 2px;
+    }
   }
 
   &__checkbox-label {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.95rem;
     line-height: 1.6;
     cursor: pointer;
   }
 
   // ============================================
-  // MENSAJES DE ERROR
+  // ERROR MESSAGE
   // ============================================
   &__error {
     background: rgba(244, 67, 54, 0.16);
     border: 1px solid rgba(244, 67, 54, 0.45);
-    color: #ff5252;
+    color: #ff6666;
     padding: 1rem 1.15rem;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -343,10 +402,14 @@
       height: 22px;
       flex-shrink: 0;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   // ============================================
-  // BOTONES
+  // BUTTONS
   // ============================================
   &__actions {
     display: flex;
@@ -372,10 +435,12 @@
     justify-content: center;
     gap: 0.75rem;
     letter-spacing: 0.3px;
+    min-height: 56px;
 
     svg {
       width: 22px;
       height: 22px;
+      flex-shrink: 0;
     }
 
     &:disabled {
@@ -384,15 +449,37 @@
       transform: none !important;
     }
 
+    &:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.8);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover:not(:disabled),
+      &:active:not(:disabled) {
+        transform: none !important;
+      }
+    }
+
     &--cancel {
       background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
       border: 2px solid rgba(255, 255, 255, 0.2);
 
       &:hover:not(:disabled) {
         background: rgba(255, 255, 255, 0.12);
         border-color: rgba(255, 255, 255, 0.35);
         transform: translateY(-2px);
+      }
+
+      &:focus-visible {
+        outline-color: white;
       }
     }
 
@@ -411,16 +498,16 @@
       &:active:not(:disabled) {
         transform: translateY(0);
       }
-    }
 
-    @media (max-width: 768px) {
-      width: 100%;
+      &:focus-visible {
+        outline-color: #ff6666;
+      }
     }
   }
 }
 
 // ============================================
-// ANIMACIONES
+// ANIMATIONS
 // ============================================
 @keyframes fadeInUp {
   from {

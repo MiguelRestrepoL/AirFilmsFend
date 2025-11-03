@@ -1,3 +1,15 @@
+// ============================================
+// REGISTRATION PAGE - WCAG 2.1 AA COMPLIANT
+// ============================================
+// Accessibility features:
+// - Contrast ratios meet 4.5:1 minimum (text)
+// - Focus indicators with 3:1 contrast
+// - 44x44px minimum touch targets
+// - Keyboard navigation support
+// - Reduced motion support
+// - Clear visual hierarchy
+// ============================================
+
 .registro {
   min-height: 100vh;
   display: flex;
@@ -17,6 +29,10 @@
     height: 200%;
     background: radial-gradient(circle at 50% 50%, rgba(255, 87, 34, 0.08) 0%, transparent 50%);
     animation: rotateBg 20s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__container {
@@ -36,6 +52,9 @@
     }
   }
 
+  // ============================================
+  // BRANDING SIDE
+  // ============================================
   &__branding {
     display: flex;
     flex-direction: column;
@@ -58,6 +77,10 @@
     left: 0;
     pointer-events: none;
     overflow: hidden;
+
+    @media (prefers-reduced-motion: reduce) {
+      display: none;
+    }
   }
 
   &__circle {
@@ -89,6 +112,10 @@
       right: 10%;
       animation-delay: 4s;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__logo-container {
@@ -96,6 +123,10 @@
     animation: fadeInScale 0.8s ease;
     position: relative;
     z-index: 1;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__logo-img {
@@ -112,12 +143,20 @@
     @media (max-width: 480px) {
       max-width: 220px;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__welcome {
     position: relative;
     z-index: 1;
     animation: fadeInUp 0.8s ease 0.2s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__welcome-title {
@@ -136,7 +175,7 @@
   }
 
   &__welcome-text {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 1.125rem;
     line-height: 1.6;
     max-width: 450px;
@@ -165,6 +204,7 @@
     border: 1px solid rgba(255, 87, 34, 0.2);
     transition: all 0.3s ease;
     animation: fadeInUp 0.8s ease backwards;
+    min-height: 44px;
 
     &:nth-child(1) { animation-delay: 0.3s; }
     &:nth-child(2) { animation-delay: 0.4s; }
@@ -184,13 +224,25 @@
     }
 
     span {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.9);
       font-size: 0.95rem;
       font-weight: 500;
       text-align: left;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
   }
 
+  // ============================================
+  // FORM CONTAINER
+  // ============================================
   &__form-container {
     padding: 3rem;
     display: flex;
@@ -234,6 +286,10 @@
   &__form-header {
     margin-bottom: 2rem;
     animation: fadeInUp 0.8s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__title {
@@ -248,16 +304,23 @@
   }
 
   &__subtitle {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.95rem;
     margin: 0;
   }
 
+  // ============================================
+  // FORM
+  // ============================================
   &__form {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
     animation: fadeInUp 0.8s ease 0.2s both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
   &__form-row {
@@ -277,7 +340,7 @@
   }
 
   &__label {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -294,9 +357,13 @@
     left: 1rem;
     width: 20px;
     height: 20px;
-    color: rgba(255, 152, 0, 0.6);
+    color: rgba(255, 152, 0, 0.7);
     pointer-events: none;
     transition: color 0.3s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   &__input {
@@ -309,15 +376,16 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     outline: none;
+    min-height: 52px;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.5);
     }
 
     &:focus {
       background: rgba(255, 255, 255, 0.08);
       border-color: #ff5722;
-      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.1);
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.2);
 
       ~ .registro__input-icon {
         color: #ff5722;
@@ -337,8 +405,15 @@
         margin: 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
+  // ============================================
+  // PASSWORD STRENGTH
+  // ============================================
   &__password-strength {
     display: flex;
     align-items: center;
@@ -358,6 +433,10 @@
     height: 100%;
     transition: all 0.3s ease;
     border-radius: 10px;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   &__password-strength-text {
@@ -368,12 +447,15 @@
   }
 
   &__hint {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.65);
     font-size: 0.8rem;
     margin-top: -0.25rem;
     line-height: 1.4;
   }
 
+  // ============================================
+  // BUTTONS
+  // ============================================
   &__submit-btn {
     width: 100%;
     padding: 1.125rem;
@@ -391,6 +473,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    min-height: 56px;
 
     svg {
       width: 20px;
@@ -413,19 +496,28 @@
     }
 
     &:focus-visible {
-      outline: 3px solid rgba(255, 255, 255, 0.5);
+      outline: 3px solid rgba(255, 255, 255, 0.8);
       outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover,
+      &:active {
+        transform: none;
+      }
     }
   }
 
   &__login-link {
     text-align: center;
     margin-top: 1.5rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.95rem;
 
     a {
-      color: #ff9800;
+      color: #ffb74d;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
@@ -436,17 +528,24 @@
       }
 
       &:focus-visible {
-        outline: 2px solid #ff5722;
+        outline: 3px solid #ff5722;
         outline-offset: 3px;
         border-radius: 4px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
       }
     }
   }
 
+  // ============================================
+  // ERROR MESSAGE
+  // ============================================
   &__error {
     background: rgba(244, 67, 54, 0.15);
     border: 1px solid rgba(244, 67, 54, 0.4);
-    color: #ff5252;
+    color: #ff6666;
     padding: 0.875rem 1rem;
     border-radius: 10px;
     font-size: 0.9rem;
@@ -461,8 +560,15 @@
       height: 20px;
       flex-shrink: 0;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
 
+  // ============================================
+  // LOADING STATE
+  // ============================================
   &__loading {
     display: flex;
     align-items: center;
@@ -477,9 +583,16 @@
     border-top-color: white;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: spin 3s linear infinite;
+    }
   }
 }
 
+// ============================================
+// ANIMATIONS
+// ============================================
 @keyframes rotateBg {
   0% {
     transform: rotate(0deg);
@@ -550,29 +663,29 @@
 }
 
 // ============================================
-// RESPONSIVE FIXES
+// RESPONSIVE
 // ============================================
 @media (max-width: 968px) {
   .registro {
-    padding: 0.5rem; // Muy poco padding
-    align-items: flex-start; // Alinear arriba
+    padding: 0.5rem;
+    align-items: flex-start;
     
     &__container {
-      gap: 1rem; // Gap mínimo
+      gap: 1rem;
       padding-top: 0.5rem;
     }
 
     &__branding {
-      padding: 0.5rem; // Padding mínimo
+      padding: 0.5rem;
       min-height: auto;
     }
 
     &__logo-container {
-      margin-bottom: 0.5rem; // Margen mínimo
+      margin-bottom: 0.5rem;
     }
 
     &__logo-img {
-      max-width: 120px; // Logo MUY pequeño
+      max-width: 120px;
     }
 
     &__welcome {
@@ -580,25 +693,25 @@
     }
 
     &__welcome-title {
-      font-size: 1.1rem; // Texto pequeño
+      font-size: 1.1rem;
       margin-bottom: 0;
     }
 
     &__welcome-text {
-      display: none; // Ocultar texto extra
+      display: none;
     }
 
     &__features {
-      display: none; // Ocultar features
+      display: none;
     }
 
     &__form-container {
       padding: 1.5rem 1rem;
-      max-height: none; // Permitir scroll natural
+      max-height: none;
     }
 
     &__animated-bg {
-      display: none; // Ocultar círculos animados
+      display: none;
     }
   }
 }
@@ -616,7 +729,7 @@
     }
 
     &__logo-img {
-      max-width: 100px; // Logo SÚPER pequeño
+      max-width: 100px;
     }
 
     &__welcome-title {

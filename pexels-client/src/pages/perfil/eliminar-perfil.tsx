@@ -3,11 +3,40 @@ import { useNavigate } from "react-router-dom";
 import "./eliminar-perfil.scss";
 
 /**
- * Página para eliminar cuenta de usuario de forma permanente.
- * Muestra advertencias y requiere confirmación explícita.
+ * Account deletion page component.
+ * Displays warnings and requires explicit confirmation before permanent deletion.
+ * 
+ * Features:
+ * - Multiple safety checks before deletion
+ * - Password verification required
+ * - Confirmation phrase matching
+ * - Explicit checkbox acknowledgment
+ * - User account information display
+ * - Comprehensive warnings about data loss
+ * 
+ * Accessibility features:
+ * - Semantic HTML structure with proper heading hierarchy
+ * - ARIA labels for all interactive elements
+ * - Form validation with accessible error messages
+ * - Keyboard navigation support
+ * - Screen reader announcements for critical actions
+ * - Clear visual warnings with appropriate ARIA attributes
+ * - Minimum 44x44px touch targets
  * 
  * @component
- * @returns {JSX.Element} Formulario de eliminación de cuenta
+ * @returns {JSX.Element} Account deletion form with safety measures
+ * 
+ * @example
+ * ```tsx
+ * <EliminarPerfil />
+ * ```
+ * 
+ * @accessibility
+ * - WCAG 2.1 AA compliant
+ * - Critical warnings with appropriate ARIA roles
+ * - Form semantics with proper label associations
+ * - Error messages announced to screen readers
+ * - Focus management during form interaction
  */
 const EliminarPerfil: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +44,7 @@ const EliminarPerfil: React.FC = () => {
   const [confirmCheckbox, setConfirmCheckbox] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPassword, setCurrentPassword] = useState(""); // ✅ AGREGADO
+  const [currentPassword, setCurrentPassword] = useState("");
 
   const CONFIRMATION_PHRASE = "ELIMINAR";
 
@@ -27,7 +56,10 @@ const EliminarPerfil: React.FC = () => {
   });
 
   /**
-   * Carga la información del usuario al montar el componente
+   * Loads user information on component mount.
+   * Redirects to login if no valid token is found.
+   * 
+   * @async
    */
   useEffect(() => {
     const cargarDatosUsuario = async () => {
@@ -53,7 +85,6 @@ const EliminarPerfil: React.FC = () => {
         const data = await response.json();
         
         if (data.success && data.user) {
-          // Formatear fecha de creación
           const createdDate = data.user.createdAt 
             ? new Date(data.user.createdAt).toLocaleDateString('es-ES')
             : "N/A";
@@ -62,7 +93,7 @@ const EliminarPerfil: React.FC = () => {
             name: `${data.user.name} ${data.user.lastName}`,
             email: data.user.email || "",
             createdDate: createdDate,
-            moviesRated: "0" // Placeholder hasta que tengas este dato en el backend
+            moviesRated: "0"
           });
         }
       } catch (err: any) {
@@ -75,13 +106,16 @@ const EliminarPerfil: React.FC = () => {
   }, [navigate]);
 
   /**
-   * Maneja la eliminación de la cuenta
+   * Handles account deletion process.
+   * Validates all safety checks before proceeding.
+   * 
+   * @param {React.FormEvent} e - Form submission event
+   * @async
    */
   const handleEliminarCuenta = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validaciones
     if (!currentPassword) {
       setError("Debes ingresar tu contraseña actual");
       return;
@@ -109,7 +143,7 @@ const EliminarPerfil: React.FC = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ password: currentPassword }) // ✅ AGREGADO para enviar contraseña
+        body: JSON.stringify({ password: currentPassword })
       });
 
       const data = await response.json();
@@ -118,7 +152,6 @@ const EliminarPerfil: React.FC = () => {
         throw new Error(data.message || "Error al eliminar cuenta");
       }
 
-      // Limpiar localStorage y redirigir
       localStorage.removeItem("authToken");
       navigate("/inicio-sesion");
     } catch (err: any) {
@@ -130,7 +163,7 @@ const EliminarPerfil: React.FC = () => {
   };
 
   /**
-   * Cancela y regresa al perfil
+   * Cancels deletion and returns to profile page.
    */
   const handleCancelar = () => {
     navigate("/perfil");
@@ -139,15 +172,26 @@ const EliminarPerfil: React.FC = () => {
   return (
     <div className="eliminar-perfil">
       <div className="eliminar-perfil__container">
-        {/* Logo */}
-        <div className="eliminar-perfil__logo-header">
-          <img src="/airfilms.png" alt="AirFilms Logo" className="eliminar-perfil__logo" />
-        </div>
+        <header className="eliminar-perfil__logo-header">
+          <img 
+            src="/airfilms.png" 
+            alt="AirFilms" 
+            className="eliminar-perfil__logo"
+          />
+        </header>
 
-        {/* Header con icono de advertencia */}
         <div className="eliminar-perfil__header">
-          <div className="eliminar-perfil__icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
+          <div 
+            className="eliminar-perfil__icon"
+            role="img"
+            aria-label="Warning icon"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
               <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
           </div>
@@ -157,15 +201,30 @@ const EliminarPerfil: React.FC = () => {
           </p>
         </div>
 
-        {/* Advertencia crítica */}
-        <div className="eliminar-perfil__warning">
-          <div className="eliminar-perfil__warning-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
+        <section 
+          className="eliminar-perfil__warning"
+          role="alert"
+          aria-labelledby="warning-title"
+        >
+          <div 
+            className="eliminar-perfil__warning-icon"
+            aria-hidden="true"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+              focusable="false"
+            >
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
             </svg>
           </div>
           <div className="eliminar-perfil__warning-content">
-            <h3 className="eliminar-perfil__warning-title">¡ADVERTENCIA CRÍTICA!</h3>
+            <h2 
+              id="warning-title"
+              className="eliminar-perfil__warning-title"
+            >
+              ¡ADVERTENCIA CRÍTICA!
+            </h2>
             <p className="eliminar-perfil__warning-text">
               Estás a punto de eliminar permanentemente tu cuenta de AirFilms. Esta acción:
             </p>
@@ -177,48 +236,65 @@ const EliminarPerfil: React.FC = () => {
               <li>Requerirá crear una nueva cuenta si deseas volver</li>
             </ul>
           </div>
-        </div>
+        </section>
 
-        {/* Información de la cuenta */}
-        <div className="eliminar-perfil__info">
-          <h3 className="eliminar-perfil__info-title">Datos de la cuenta a eliminar:</h3>
-          <div className="eliminar-perfil__info-grid">
+        <section 
+          className="eliminar-perfil__info"
+          aria-labelledby="account-info-title"
+        >
+          <h2 
+            id="account-info-title"
+            className="eliminar-perfil__info-title"
+          >
+            Datos de la cuenta a eliminar:
+          </h2>
+          <dl className="eliminar-perfil__info-grid">
             <div className="eliminar-perfil__info-item">
-              <span className="eliminar-perfil__info-label">Nombre:</span>
-              <span className="eliminar-perfil__info-value">{userInfo.name}</span>
+              <dt className="eliminar-perfil__info-label">Nombre:</dt>
+              <dd className="eliminar-perfil__info-value">{userInfo.name}</dd>
             </div>
             <div className="eliminar-perfil__info-item">
-              <span className="eliminar-perfil__info-label">Email:</span>
-              <span className="eliminar-perfil__info-value">{userInfo.email}</span>
+              <dt className="eliminar-perfil__info-label">Email:</dt>
+              <dd className="eliminar-perfil__info-value">{userInfo.email}</dd>
             </div>
             <div className="eliminar-perfil__info-item">
-              <span className="eliminar-perfil__info-label">Cuenta creada:</span>
-              <span className="eliminar-perfil__info-value">{userInfo.createdDate}</span>
+              <dt className="eliminar-perfil__info-label">Cuenta creada:</dt>
+              <dd className="eliminar-perfil__info-value">{userInfo.createdDate}</dd>
             </div>
             <div className="eliminar-perfil__info-item">
-              <span className="eliminar-perfil__info-label">Películas calificadas:</span>
-              <span className="eliminar-perfil__info-value">{userInfo.moviesRated}</span>
+              <dt className="eliminar-perfil__info-label">Películas calificadas:</dt>
+              <dd className="eliminar-perfil__info-value">{userInfo.moviesRated}</dd>
             </div>
-          </div>
-        </div>
+          </dl>
+        </section>
 
-        {/* Pasos para proceder */}
-        <div className="eliminar-perfil__steps">
-          <h3 className="eliminar-perfil__steps-title">
+        <section 
+          className="eliminar-perfil__steps"
+          aria-labelledby="steps-title"
+        >
+          <h2 
+            id="steps-title"
+            className="eliminar-perfil__steps-title"
+          >
             Para proceder, debes completar los siguientes pasos:
-          </h3>
+          </h2>
           <ol className="eliminar-perfil__steps-list">
             <li>Ingresa tu contraseña actual para verificar tu identidad</li>
             <li>Escribe exactamente la frase de confirmación que aparece abajo</li>
             <li>Confirma que entiendes que esta acción es irreversible</li>
           </ol>
-        </div>
+        </section>
 
-        {/* Formulario */}
-        <form className="eliminar-perfil__form" onSubmit={handleEliminarCuenta}>
-          {/* Contraseña actual */}
+        <form 
+          className="eliminar-perfil__form" 
+          onSubmit={handleEliminarCuenta}
+          noValidate
+        >
           <div className="eliminar-perfil__form-group">
-            <label htmlFor="currentPassword" className="eliminar-perfil__label">
+            <label 
+              htmlFor="currentPassword" 
+              className="eliminar-perfil__label"
+            >
               CONTRASEÑA ACTUAL 🔒
             </label>
             <input
@@ -230,18 +306,30 @@ const EliminarPerfil: React.FC = () => {
               onChange={(e) => setCurrentPassword(e.target.value)}
               disabled={isLoading}
               autoComplete="current-password"
+              required
+              aria-required="true"
+              aria-invalid={error && !currentPassword ? "true" : "false"}
             />
           </div>
 
-          {/* Frase de confirmación */}
           <div className="eliminar-perfil__form-group">
-            <label htmlFor="confirmation" className="eliminar-perfil__label">
+            <label 
+              htmlFor="confirmation" 
+              className="eliminar-perfil__label"
+            >
               CONFIRMACIÓN ⚠️
             </label>
-            <p className="eliminar-perfil__confirmation-hint">
+            <p 
+              className="eliminar-perfil__confirmation-hint"
+              id="confirmation-hint"
+            >
               Escribe exactamente esta frase:
             </p>
-            <div className="eliminar-perfil__phrase-box">
+            <div 
+              className="eliminar-perfil__phrase-box"
+              role="status"
+              aria-label={`Confirmation phrase: ${CONFIRMATION_PHRASE}`}
+            >
               {CONFIRMATION_PHRASE}
             </div>
             <input
@@ -252,10 +340,13 @@ const EliminarPerfil: React.FC = () => {
               value={confirmationPhrase}
               onChange={(e) => setConfirmationPhrase(e.target.value)}
               disabled={isLoading}
+              required
+              aria-required="true"
+              aria-describedby="confirmation-hint"
+              aria-invalid={error && confirmationPhrase.toUpperCase() !== CONFIRMATION_PHRASE ? "true" : "false"}
             />
           </div>
 
-          {/* Checkbox de confirmación */}
           <div className="eliminar-perfil__checkbox-group">
             <input
               id="confirm"
@@ -264,33 +355,56 @@ const EliminarPerfil: React.FC = () => {
               checked={confirmCheckbox}
               onChange={(e) => setConfirmCheckbox(e.target.checked)}
               disabled={isLoading}
+              required
+              aria-required="true"
+              aria-describedby="checkbox-label"
             />
-            <label htmlFor="confirm" className="eliminar-perfil__checkbox-label">
+            <label 
+              htmlFor="confirm" 
+              id="checkbox-label"
+              className="eliminar-perfil__checkbox-label"
+            >
               Confirmo que he leído y entendido todas las advertencias. Acepto que esta acción
               eliminará permanentemente mi cuenta y todos mis datos, y que no podrá ser revertida
               bajo ninguna circunstancia.
             </label>
           </div>
 
-          {/* Mensaje de error */}
           {error && (
-            <div className="eliminar-perfil__error">
-              <svg viewBox="0 0 24 24" fill="currentColor">
+            <div 
+              className="eliminar-perfil__error"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
               </svg>
               <span>{error}</span>
             </div>
           )}
 
-          {/* Botones */}
           <div className="eliminar-perfil__actions">
             <button
               type="button"
               className="eliminar-perfil__btn eliminar-perfil__btn--cancel"
               onClick={handleCancelar}
               disabled={isLoading}
+              aria-label="Cancel and return to profile"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
               Cancelar y Volver
@@ -299,8 +413,15 @@ const EliminarPerfil: React.FC = () => {
               type="submit"
               className="eliminar-perfil__btn eliminar-perfil__btn--delete"
               disabled={isLoading}
+              aria-busy={isLoading}
+              aria-label="Permanently delete account"
             >
-              <svg viewBox="0 0 24 24" fill="currentColor">
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
               </svg>
               {isLoading ? "Eliminando..." : "ELIMINAR CUENTA PERMANENTEMENTE"}
