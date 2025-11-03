@@ -397,6 +397,7 @@
     }
 
     &[type="number"] {
+      appearance: textfield;
       -moz-appearance: textfield;
       
       &::-webkit-outer-spin-button,
