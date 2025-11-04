@@ -1,4 +1,3 @@
-
 .rating-modal {
   position: fixed;
   top: 0;
@@ -184,7 +183,9 @@
     }
   }
 
-  // ===== STATISTICS SECTION =====
+  // ========================================
+  // STATISTICS SECTION
+  // ========================================
   &__stats {
     background: rgba(255, 193, 7, 0.05);
     border: 2px solid rgba(255, 193, 7, 0.2);
@@ -285,7 +286,382 @@
     }
   }
 
-  // ===== RATING SELECTOR =====
+  // ========================================
+  // COMMENTS SECTION
+  // ========================================
+  &__comments-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(255, 193, 7, 0.2);
+  }
+
+  &__comments-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffc107;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: "💬";
+      font-size: 1.5rem;
+    }
+  }
+
+  // Comment Form
+  &__comment-form {
+    margin-bottom: 1.5rem;
+    background: rgba(255, 193, 7, 0.05);
+    border: 2px solid rgba(255, 193, 7, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  &__comment-textarea {
+    width: 100%;
+    padding: 0.875rem;
+    min-height: 44px; // ✅ WCAG: Minimum touch target
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 100px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      border-color: #ffc107;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__comment-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__char-count {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+
+    &[data-warning="true"] {
+      color: #ff9800;
+    }
+
+    &[data-error="true"] {
+      color: #f44336;
+      font-weight: 600;
+    }
+  }
+
+  &__btn--comment {
+    padding: 0.625rem 1.25rem;
+    min-height: 44px; // ✅ WCAG: Minimum touch target
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #ffc107, #ffca28);
+    color: #000;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
+
+    &:hover:not(:disabled) {
+      background: #ffca28;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  }
+
+  // Comments List
+  &__comments-list {
+    max-height: 450px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 0.5rem;
+
+    // ✅ WCAG: Better scrollbar visibility
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 193, 7, 0.4);
+      border-radius: 5px;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 193, 7, 0.6);
+      }
+    }
+  }
+
+  &__loading-comments {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2.5rem;
+    color: rgba(255, 255, 255, 0.7);
+
+    .rating-modal__spinner {
+      margin: 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__no-comments {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    font-size: 1rem;
+    background: rgba(255, 193, 7, 0.03);
+    border: 2px dashed rgba(255, 193, 7, 0.2);
+    border-radius: 8px;
+  }
+
+  // Individual Comment
+  &__comment {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    margin-bottom: 0.875rem;
+    border: 2px solid rgba(255, 193, 7, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+
+    &:hover {
+      border-color: rgba(255, 193, 7, 0.3);
+      background: rgba(0, 0, 0, 0.5);
+      transform: translateX(4px);
+    }
+
+    &:focus-within {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      border-color: #ffc107;
+    }
+  }
+
+  &__comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.625rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__comment-author {
+    font-weight: 600;
+    color: #ffc107;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: "👤";
+      font-size: 1rem;
+    }
+  }
+
+  &__comment-date {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+  }
+
+  &__comment-text {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    word-wrap: break-word;
+    word-break: break-word;
+    font-size: 0.95rem;
+    white-space: pre-wrap; // Preserves line breaks
+  }
+
+  &__comment-delete {
+    background: rgba(244, 67, 54, 0.15);
+    border: 2px solid rgba(244, 67, 54, 0.3);
+    border-radius: 6px;
+    color: #ffcdd2;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.375rem 0.875rem;
+    min-height: 36px; // ✅ WCAG: Minimum touch target
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    &::before {
+      content: "🗑️";
+      font-size: 0.9rem;
+    }
+
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba(244, 67, 54, 0.25);
+      border-color: #ef5350;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  }
+
+  // Pagination
+  &__pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 193, 7, 0.05);
+    border: 2px solid rgba(255, 193, 7, 0.15);
+    border-radius: 8px;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__pagination-btn {
+    background: rgba(255, 193, 7, 0.15);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    padding: 0.625rem 1.25rem;
+    min-height: 44px; // ✅ WCAG: Minimum touch target
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 193, 7, 0.3);
+      border-color: #ffc107;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none !important;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  &__pagination-info {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  // ========================================
+  // RATING SELECTOR
+  // ========================================
   &__selector {
     text-align: center;
     margin-bottom: 2rem;
@@ -308,6 +684,7 @@
   &__star {
     width: 60px;
     height: 60px;
+    min-height: 44px; // ✅ WCAG: Minimum touch target
     background: transparent;
     border: 2px solid rgba(255, 193, 7, 0.3);
     border-radius: 8px;
@@ -378,9 +755,12 @@
     color: #ffcdd2;
     text-align: center;
     font-weight: 500;
+    line-height: 1.5;
   }
 
-  // ===== ACTION BUTTONS =====
+  // ========================================
+  // ACTION BUTTONS
+  // ========================================
   &__actions {
     display: flex;
     gap: 1rem;
@@ -391,7 +771,7 @@
     flex: 1;
     min-width: 200px;
     padding: 0.875rem 1.5rem;
-    min-height: 48px;
+    min-height: 48px; // ✅ WCAG: Minimum touch target
     border-radius: 8px;
     font-weight: 600;
     font-size: 1rem;
@@ -448,10 +828,19 @@
     }
   }
 
-  // ===== RESPONSIVE =====
+  // ========================================
+  // RESPONSIVE DESIGN
+  // ========================================
   @media (max-width: 768px) {
+    padding: 0.5rem;
+
     &__content {
       padding: 1.5rem;
+      max-height: 95vh;
+    }
+
+    &__header {
+      padding-right: 2.5rem;
     }
 
     &__title {
@@ -479,24 +868,99 @@
     &__btn {
       min-width: 100%;
     }
+
+    &__comment-form-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__btn--comment {
+      width: 100%;
+    }
+
+    &__pagination {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__pagination-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    &__pagination-info {
+      order: -1;
+      margin-bottom: 0.5rem;
+    }
+
+    &__comments-list {
+      max-height: 300px;
+    }
   }
 
-  // ===== WCAG: HIGH CONTRAST MODE =====
+  @media (max-width: 480px) {
+    &__stars {
+      gap: 0.375rem;
+    }
+
+    &__star {
+      width: 44px;
+      height: 44px;
+
+      svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    &__average-number {
+      font-size: 2.5rem;
+    }
+
+    &__comment {
+      padding: 0.875rem;
+    }
+
+    &__comment-textarea {
+      min-height: 80px;
+      font-size: 0.9rem;
+    }
+  }
+
+  // ========================================
+  // WCAG: HIGH CONTRAST MODE
+  // ========================================
   @media (prefers-contrast: high) {
     &__close,
     &__star,
-    &__btn {
+    &__btn,
+    &__comment-textarea,
+    &__pagination-btn,
+    &__comment-delete {
       border-width: 3px;
     }
 
     &__stats,
     &__no-ratings,
-    &__error-inline {
+    &__error-inline,
+    &__comment-form,
+    &__comment,
+    &__pagination {
       border-width: 3px;
+    }
+
+    &__bar-fill {
+      box-shadow: 0 0 0 2px #000;
+    }
+
+    &__comment-text {
+      color: #fff;
     }
   }
 
-  // ===== WCAG: REDUCED MOTION =====
+  // ========================================
+  // WCAG: REDUCED MOTION
+  // ========================================
   @media (prefers-reduced-motion: reduce) {
     &,
     &__content,
@@ -505,6 +969,10 @@
     &__btn,
     &__spinner,
     &__bar-fill,
+    &__comment,
+    &__pagination-btn,
+    &__btn--comment,
+    &__comment-delete,
     * {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
@@ -538,5 +1006,34 @@
         transform: none;
       }
     }
+
+    &__close:hover,
+    &__star:hover,
+    &__btn:hover,
+    &__comment:hover,
+    &__pagination-btn:hover,
+    &__comment-delete:hover {
+      transform: none !important;
+    }
+  }
+
+  // ========================================
+  // WCAG: DARK MODE SUPPORT (additional)
+  // ========================================
+  @media (prefers-color-scheme: dark) {
+    &__content {
+      background: #121212;
+    }
+
+    &__comment-textarea {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  // ========================================
+  // PRINT STYLES (hide modal in print)
+  // ========================================
+  @media print {
+    display: none;
   }
 }
