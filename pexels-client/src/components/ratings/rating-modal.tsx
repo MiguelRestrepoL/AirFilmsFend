@@ -46,15 +46,17 @@ const RatingModal: React.FC<RatingModalProps> = ({
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const COMMENTS_PER_PAGE = 5;
 
   /**
-   * Fetches rating statistics and comments on mount
+   * Fetches rating statistics, comments, and current user ID on mount
    */
   useEffect(() => {
     loadStats();
     loadComments();
+    loadCurrentUserId();
   }, [movieId]);
 
   /**
@@ -80,6 +82,28 @@ const RatingModal: React.FC<RatingModalProps> = ({
       document.body.style.overflow = "unset";
     };
   }, [onClose]);
+
+  /**
+   * Loads current user ID from JWT token
+   */
+  const loadCurrentUserId = () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.log("❌ No hay token de autenticación");
+        return;
+      }
+
+      // Decodificar el JWT (el payload está en la segunda parte)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userId = payload.userId || payload.sub || payload.id;
+      
+      console.log("👤 Usuario actual:", userId);
+      setCurrentUserId(userId);
+    } catch (error) {
+      console.error("Error al obtener userId del token:", error);
+    }
+  };
 
   /**
    * Loads rating statistics from backend
@@ -109,7 +133,12 @@ const RatingModal: React.FC<RatingModalProps> = ({
         currentPage,
         COMMENTS_PER_PAGE
       );
-      console.log("📝 Comentarios cargados:", data.data.map(c => ({ id: c.id, type: typeof c.id, author: c.users[0]?.name })));
+      console.log("📝 Comentarios cargados:", data.data.map(c => ({ 
+        id: c.id, 
+        userId: c.userId,
+        type: typeof c.id, 
+        author: c.users[0]?.name 
+      })));
       setComments(data.data);
       setCommentsCount(data.count);
     } catch (err: any) {
@@ -209,7 +238,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Deletes a comment
+   * Deletes a comment (only if user is the owner)
    */
   const handleCommentDelete = async (commentId: string) => {
     console.log("🔍 Intentando eliminar comentario:", {
@@ -408,14 +437,18 @@ const RatingModal: React.FC<RatingModalProps> = ({
                         </span>
                       </div>
                       <p className="rating-modal__comment-text">{comment.comment}</p>
-                      <button
-                        onClick={() => handleCommentDelete(comment.id)}
-                        className="rating-modal__comment-delete"
-                        aria-label="Eliminar comentario"
-                        disabled={isSaving}
-                      >
-                        Eliminar
-                      </button>
+                      
+                      {/* ✅ SOLO muestra el botón si el usuario actual es el dueño del comentario */}
+                      {currentUserId && currentUserId === comment.userId && (
+                        <button
+                          onClick={() => handleCommentDelete(comment.id)}
+                          className="rating-modal__comment-delete"
+                          aria-label="Eliminar comentario"
+                          disabled={isSaving}
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   ))
                 )}
