@@ -239,12 +239,12 @@ export const servicioPeliculas = {
    * Fetches video data from Pexels by video ID.
    * 
    * Makes a GET request to /api/movies/get-video and maps Pexels API response
-   * to frontend structure with video files in different qualities.
+   * to frontend structure with video files in different qualities and subtitles.
    * 
    * @async
    * @function obtenerVideo
    * @param {string | number} videoId - The Pexels video ID
-   * @returns {Promise<PexelsVideo>} Promise resolving to video data with multiple quality options
+   * @returns {Promise<PexelsVideo>} Promise resolving to video data with multiple quality options and subtitles
    * @throws {Error} When API request fails, video not found (404), or other errors occur
    * 
    * @example
@@ -255,6 +255,9 @@ export const servicioPeliculas = {
    *   video.videoFiles.forEach(file => {
    *     console.log(`- ${file.quality}: ${file.width}x${file.height}`);
    *   });
+   *   if (video.subtitles?.length > 0) {
+   *     console.log(`Subtitles available: ${video.subtitles.map(s => s.lang).join(', ')}`);
+   *   }
    * } catch (error) {
    *   if (error.message === "Video no encontrado") {
    *     console.log("This video is no longer available");
@@ -266,12 +269,14 @@ export const servicioPeliculas = {
    * @accessibility
    * - Provides video metadata for accessible media players
    * - Returns multiple quality options for bandwidth considerations
+   * - Includes subtitle tracks for accessibility compliance
    * - Distinguishes between "not found" and other errors for better UX
    * 
    * @note
    * - 404 errors throw "Video no encontrado" specifically (not critical error)
    * - Maps snake_case Pexels API response to camelCase
    * - Returns empty array for videoFiles if none available
+   * - Returns empty array for subtitles if none available
    */
   obtenerVideo: async (videoId: string | number): Promise<PexelsVideo> => {
     try {
@@ -296,7 +301,14 @@ export const servicioPeliculas = {
           width: file.width,
           height: file.height,
           link: file.link
-        })) || []
+        })) || [],
+        // ✅ MAPEO DE SUBTÍTULOS AGREGADO
+        subtitles: data.subtitles?.map((sub: any) => ({
+          id: sub.id,
+          lang: sub.lang,
+          file_type: sub.file_type,
+          link: sub.link
+        })) ?? [] // Array vacío si no hay subtítulos
       };
     } catch (error: any) {
       console.error("Error al obtener video:", error);
