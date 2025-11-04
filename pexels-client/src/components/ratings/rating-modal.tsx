@@ -1,0 +1,341 @@
+import React, { useEffect, useState } from "react";
+import { servicioRatings } from "../../services/ratings.servicio";
+import type { MovieRatingStats } from "../../types/movies.types";
+import "./rating-modal.scss";
+
+interface RatingModalProps {
+  movieId: number;
+  movieTitle: string;
+  onClose: () => void;
+  onRatingChange?: () => void;
+}
+
+/**
+ * Rating Modal Component
+ * 
+ * Interactive modal for rating movies with 1-5 stars.
+ * Shows rating distribution and allows users to submit/update/delete ratings.
+ * 
+ * Features:
+ * - Interactive 5-star rating system
+ * - Real-time rating statistics
+ * - Distribution visualization (bar chart)
+ * - Update/delete existing ratings
+ * - Full WCAG 2.1 AA compliance
+ * 
+ * @component
+ * @param {RatingModalProps} props - Component props
+ * @returns {JSX.Element} Rating modal overlay
+ */
+const RatingModal: React.FC<RatingModalProps> = ({
+  movieId,
+  movieTitle,
+  onClose,
+  onRatingChange,
+}) => {
+  const [stats, setStats] = useState<MovieRatingStats | null>(null);
+  const [selectedRating, setSelectedRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Fetches rating statistics on mount
+   */
+  useEffect(() => {
+    loadStats();
+  }, [movieId]);
+
+  /**
+   * Handles ESC key press and body scroll lock
+   */
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [onClose]);
+
+  /**
+   * Loads rating statistics from backend
+   */
+  const loadStats = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await servicioRatings.obtenerEstadisticas(movieId);
+      setStats(data);
+    } catch (err: any) {
+      console.error("Error al cargar estadísticas:", err);
+      setError(err.message || "Error al cargar estadísticas de calificación");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Submits user rating to backend
+   */
+  const handleSubmit = async () => {
+    if (selectedRating === 0) {
+      alert("Por favor selecciona una calificación");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      await servicioRatings.calificar(movieId, selectedRating);
+      
+      // Reload stats to show updated data
+      await loadStats();
+      
+      if (onRatingChange) {
+        onRatingChange();
+      }
+
+      // Close modal after short delay
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    } catch (err: any) {
+      console.error("Error al guardar calificación:", err);
+      setError(err.message || "Error al guardar calificación");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Deletes user's rating
+   */
+  const handleDelete = async () => {
+    if (!confirm("¿Estás seguro de que quieres eliminar tu calificación?")) {
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      await servicioRatings.eliminarCalificacion(movieId);
+      
+      // Reload stats and reset selection
+      await loadStats();
+      setSelectedRating(0);
+      
+      if (onRatingChange) {
+        onRatingChange();
+      }
+
+      // Close modal after short delay
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    } catch (err: any) {
+      console.error("Error al eliminar calificación:", err);
+      setError(err.message || "Error al eliminar calificación");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Calculates percentage for rating distribution bar
+   */
+  const getPercentage = (count: number): number => {
+    if (!stats || stats.totalCount === 0) return 0;
+    return Math.round((count / stats.totalCount) * 100);
+  };
+
+  const averageRating = stats ? servicioRatings.calcularPromedio(stats) : 0;
+
+  return (
+    <div
+      className="rating-modal"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rating-modal-title"
+    >
+      <div
+        className="rating-modal__content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="rating-modal__close"
+          onClick={onClose}
+          aria-label="Cerrar modal de calificación"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M18 6L6 18M6 6l12 12" strokeWidth="2" />
+          </svg>
+        </button>
+
+        <div className="rating-modal__header">
+          <h2 id="rating-modal-title" className="rating-modal__title">
+            Calificar Película
+          </h2>
+          <p className="rating-modal__movie-title">{movieTitle}</p>
+        </div>
+
+        {isLoading ? (
+          <div className="rating-modal__loading" role="status" aria-live="polite">
+            <div className="rating-modal__spinner" aria-hidden="true"></div>
+            <p>Cargando estadísticas...</p>
+          </div>
+        ) : error && !stats ? (
+          <div className="rating-modal__error" role="alert">
+            <p>{error}</p>
+            <button onClick={loadStats} className="rating-modal__retry-btn">
+              Reintentar
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Current Statistics */}
+            {stats && stats.totalCount > 0 && (
+              <div className="rating-modal__stats">
+                <div className="rating-modal__average">
+                  <span className="rating-modal__average-number">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <div className="rating-modal__average-stars">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        viewBox="0 0 24 24"
+                        fill={star <= Math.round(averageRating) ? "#ffc107" : "none"}
+                        stroke="#ffc107"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="rating-modal__total">
+                    {stats.totalCount} {stats.totalCount === 1 ? "calificación" : "calificaciones"}
+                  </span>
+                </div>
+
+                {/* Distribution Bars */}
+                <div className="rating-modal__distribution">
+                  {[5, 4, 3, 2, 1].map((star) => (
+                    <div key={star} className="rating-modal__bar-row">
+                      <span className="rating-modal__bar-label">{star}★</span>
+                      <div className="rating-modal__bar-container">
+                        <div
+                          className="rating-modal__bar-fill"
+                          style={{ width: `${getPercentage(stats.distribution[star - 1])}%` }}
+                          role="progressbar"
+                          aria-valuenow={stats.distribution[star - 1]}
+                          aria-valuemin={0}
+                          aria-valuemax={stats.totalCount}
+                          aria-label={`${star} estrellas: ${stats.distribution[star - 1]} calificaciones`}
+                        ></div>
+                      </div>
+                      <span className="rating-modal__bar-count">
+                        {stats.distribution[star - 1]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {stats && stats.totalCount === 0 && (
+              <div className="rating-modal__no-ratings">
+                <p>Sé el primero en calificar esta película</p>
+              </div>
+            )}
+
+            {/* Rating Selector */}
+            <div className="rating-modal__selector">
+              <p className="rating-modal__selector-label">Tu calificación</p>
+              <div
+                className="rating-modal__stars"
+                role="radiogroup"
+                aria-label="Selecciona tu calificación de 1 a 5 estrellas"
+              >
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    className={`rating-modal__star ${
+                      star <= (hoverRating || selectedRating) ? "rating-modal__star--active" : ""
+                    }`}
+                    onClick={() => setSelectedRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    aria-label={`Calificar con ${star} ${star === 1 ? "estrella" : "estrellas"}`}
+                    aria-pressed={selectedRating === star}
+                    role="radio"
+                    aria-checked={selectedRating === star}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill={star <= (hoverRating || selectedRating) ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+              {selectedRating > 0 && (
+                <p className="rating-modal__selected-text">
+                  {selectedRating} {selectedRating === 1 ? "estrella" : "estrellas"}
+                </p>
+              )}
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="rating-modal__error-inline" role="alert" aria-live="assertive">
+                {error}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="rating-modal__actions">
+              <button
+                className="rating-modal__btn rating-modal__btn--submit"
+                onClick={handleSubmit}
+                disabled={isSaving || selectedRating === 0}
+                aria-busy={isSaving}
+              >
+                {isSaving ? "Guardando..." : "Guardar Calificación"}
+              </button>
+              <button
+                className="rating-modal__btn rating-modal__btn--delete"
+                onClick={handleDelete}
+                disabled={isSaving}
+                aria-busy={isSaving}
+              >
+                Eliminar mi Calificación
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default RatingModal;

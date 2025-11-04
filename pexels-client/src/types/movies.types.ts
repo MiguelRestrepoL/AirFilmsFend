@@ -2,7 +2,7 @@
  * Movie Types
  * 
  * Type definitions for movie-related data structures used throughout the AirFilms application.
- * Includes types for TMDB movies, Pexels videos, user favorites, and genre information.
+ * Includes types for TMDB movies, Pexels videos, user favorites, ratings, and genre information.
  * 
  * @module types/movies.types
  */
@@ -275,6 +275,83 @@ export interface MovieFavorite {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   isDeleted?: boolean;
+}
+
+/**
+ * Movie Rating Statistics
+ * 
+ * Aggregate rating data for a specific movie from backend.
+ * Contains total count and distribution across 1-5 stars.
+ * 
+ * @interface MovieRatingStats
+ * @property {number} totalCount - Total number of ratings for this movie
+ * @property {number[]} distribution - Array with count for each star rating [1★, 2★, 3★, 4★, 5★]
+ * 
+ * @example
+ * const stats: MovieRatingStats = {
+ *   totalCount: 250,
+ *   distribution: [5, 10, 30, 80, 125] // [1★, 2★, 3★, 4★, 5★]
+ * };
+ * 
+ * // Calculate average rating
+ * const average = stats.distribution.reduce((acc, count, index) => 
+ *   acc + (count * (index + 1)), 0
+ * ) / stats.totalCount;
+ * // Result: 4.28 stars
+ * 
+ * @accessibility
+ * - Announce total count and average rating to screen readers
+ * - Use ARIA labels for rating distribution visualization
+ * - Provide text alternatives for star ratings
+ * 
+ * @note
+ * - Distribution array always has exactly 5 elements (indices 0-4 represent 1-5 stars)
+ * - If totalCount is 0, distribution will be [0, 0, 0, 0, 0]
+ */
+export interface MovieRatingStats {
+  totalCount: number;
+  distribution: number[]; // [1★, 2★, 3★, 4★, 5★]
+}
+
+/**
+ * User's Rating for a Movie
+ * 
+ * Represents a single user's rating for a specific movie.
+ * Stored in Supabase 'movieRatings' table with composite primary key (userId, movieId).
+ * 
+ * @interface MovieRating
+ * @property {string} userId - Supabase user UUID (foreign key)
+ * @property {number} movieId - TMDB movie ID
+ * @property {number} rating - User's rating (1-5 stars)
+ * @property {Date | string} [createdAt] - Timestamp when rating was created
+ * @property {Date | string} [updatedAt] - Timestamp of last update
+ * 
+ * @example
+ * const userRating: MovieRating = {
+ *   userId: "550e8400-e29b-41d4-a716-446655440000",
+ *   movieId: 550,
+ *   rating: 5,
+ *   createdAt: "2025-01-15T14:30:00Z",
+ *   updatedAt: "2025-01-15T14:30:00Z"
+ * };
+ * 
+ * @accessibility
+ * - Rating should be announced as "X out of 5 stars"
+ * - Use ARIA live regions to announce rating changes
+ * - Provide keyboard navigation for rating inputs
+ * - Include visual and auditory feedback when rating is saved
+ * 
+ * @note
+ * - Backend enforces rating range (0-5) via enum validation
+ * - One user can only have one rating per movie (upsert on conflict)
+ * - Rating of 0 is technically allowed but typically means "unrated"
+ */
+export interface MovieRating {
+  userId: string;
+  movieId: number;
+  rating: number; // 1-5
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 /**
