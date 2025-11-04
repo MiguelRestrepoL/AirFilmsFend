@@ -209,6 +209,18 @@ class CommentsService {
       throw new Error("Debes iniciar sesión para eliminar comentarios");
     }
 
+    // Validate commentId format
+    if (!commentId || typeof commentId !== 'string' || commentId.trim().length === 0) {
+      throw new Error("ID de comentario inválido");
+    }
+
+    // Validate movieId
+    if (!movieId || !Number.isFinite(movieId) || movieId < 1) {
+      throw new Error("ID de película inválido");
+    }
+
+    console.log("🗑️ Eliminando comentario:", { commentId, movieId, type: typeof commentId });
+
     try {
       const response = await fetch(`${API_BASE_URL}/movies/delete-comment`, {
         method: "DELETE",
@@ -221,12 +233,17 @@ class CommentsService {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("❌ Error del servidor:", errorData);
+        
         if (response.status === 401) {
           localStorage.removeItem("authToken");
           throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
         }
         if (response.status === 404) {
           throw new Error("Comentario no encontrado");
+        }
+        if (response.status === 400) {
+          throw new Error(errorData.message || "Datos inválidos para eliminar comentario");
         }
         throw new Error(errorData.message || "Error al eliminar comentario");
       }
@@ -236,6 +253,8 @@ class CommentsService {
       if (!data.success) {
         throw new Error(data.message || "Error al eliminar comentario");
       }
+
+      console.log("✅ Comentario eliminado exitosamente");
     } catch (error) {
       console.error("Error en eliminarComentario:", error);
       throw error;
@@ -274,4 +293,4 @@ class CommentsService {
   }
 }
 
-export const servicioComentarios = new CommentsService();   
+export const servicioComentarios = new CommentsService();

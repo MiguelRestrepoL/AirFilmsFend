@@ -109,6 +109,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
         currentPage,
         COMMENTS_PER_PAGE
       );
+      console.log("📝 Comentarios cargados:", data.data.map(c => ({ id: c.id, type: typeof c.id, author: c.users[0]?.name })));
       setComments(data.data);
       setCommentsCount(data.count);
     } catch (err: any) {
@@ -211,6 +212,13 @@ const RatingModal: React.FC<RatingModalProps> = ({
    * Deletes a comment
    */
   const handleCommentDelete = async (commentId: string) => {
+    console.log("🔍 Intentando eliminar comentario:", {
+      commentId,
+      movieId,
+      type: typeof commentId,
+      length: commentId?.length
+    });
+
     if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
       return;
     }
