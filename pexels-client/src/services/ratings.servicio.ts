@@ -1,4 +1,3 @@
-
 /**
  * Ratings Service
  * 
@@ -10,10 +9,10 @@
 
 import type { MovieRatingStats } from "../types/movies.types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://airfilms-server.onrender.com/api";
 
 /**
- * Response from GET /get-ratings/:movieId endpoint
+ * Response from GET /movies/get-ratings/:movieId endpoint
  */
 interface GetRatingsResponse {
   success: boolean;
@@ -22,7 +21,7 @@ interface GetRatingsResponse {
 }
 
 /**
- * Response from POST /add-rating endpoint
+ * Response from POST /movies/add-rating endpoint
  */
 interface CreateRatingResponse {
   success: boolean;
@@ -31,7 +30,7 @@ interface CreateRatingResponse {
 }
 
 /**
- * Response from DELETE /delete-rating endpoint
+ * Response from DELETE /movies/delete-rating endpoint
  */
 interface DeleteRatingResponse {
   success: boolean;
@@ -73,7 +72,8 @@ class RatingsService {
    */
   async obtenerEstadisticas(movieId: number): Promise<MovieRatingStats> {
     try {
-      const response = await fetch(`${API_BASE_URL}/get-ratings/${movieId}`, {
+      // ✅ CORREGIDO: Agregado /movies/ antes de get-ratings
+      const response = await fetch(`${API_BASE_URL}/movies/get-ratings/${movieId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,8 @@ class RatingsService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/add-rating`, {
+      // ✅ CORREGIDO: Agregado /movies/ antes de add-rating
+      const response = await fetch(`${API_BASE_URL}/movies/add-rating`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +187,8 @@ class RatingsService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/delete-rating`, {
+      // ✅ CORREGIDO: Agregado /movies/ antes de delete-rating
+      const response = await fetch(`${API_BASE_URL}/movies/delete-rating`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
