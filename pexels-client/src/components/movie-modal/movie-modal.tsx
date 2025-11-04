@@ -302,21 +302,22 @@ const MovieModal: React.FC<MovieModalProps> = ({
                   className="movie-modal__meta"
                   aria-label="Información de la película"
                 >
-                  {/* ⭐ ESTRELLA clickeable para abrir RatingModal */}
-                  {details.voteAverage > 0 && (
-                    <>
-                      <button
-                        className="movie-modal__rating-btn"
-                        onClick={handleRatingClick}
-                        aria-label={`Calificar película. Calificación actual: ${details.voteAverage.toFixed(1)} de 10`}
-                        title="Calificar esta película"
-                      >
-                        <span aria-hidden="true">⭐</span>
-                        <span>{details.voteAverage.toFixed(1)}</span>
-                      </button>
-                      <span className="movie-modal__divider" aria-hidden="true">•</span>
-                    </>
-                  )}
+                  {/* ⭐ ESTRELLA clickeable para abrir RatingModal - SIEMPRE visible */}
+                  <button
+                    className="movie-modal__rating-btn"
+                    onClick={handleRatingClick}
+                    aria-label={details.voteAverage > 0 
+                      ? `Calificar película. Calificación TMDB: ${details.voteAverage.toFixed(1)} de 10` 
+                      : "Calificar película"}
+                    title="Calificar esta película"
+                  >
+                    <span aria-hidden="true">⭐</span>
+                    <span>
+                      {details.voteAverage > 0 ? details.voteAverage.toFixed(1) : "Calificar"}
+                    </span>
+                  </button>
+                  <span className="movie-modal__divider" aria-hidden="true">•</span>
+                  
                   <span className="movie-modal__year">
                     <span className="sr-only">Año:</span>
                     {new Date(details.releaseDate).getFullYear()}
