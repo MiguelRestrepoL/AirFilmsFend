@@ -18,6 +18,7 @@ interface MovieModalProps {
  * Features:
  * - TMDB movie information
  * - Pexels video integration (if available)
+ * - Subtitles support (VTT files)
  * - Favorites toggle functionality (heart icon)
  * - Star rating display with clickable link to RatingModal
  * - Keyboard navigation (ESC to close)
@@ -49,6 +50,19 @@ const MovieModal: React.FC<MovieModalProps> = ({
     const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
   }, []);
+
+  /**
+   * 🔍 DEBUG: Logs movie ID and title for debugging
+   */
+  useEffect(() => {
+    if (details) {
+      console.log("🎬 Película actual:", details.title, "| ID:", movieId);
+      console.log("🎥 Video data:", video);
+      if (video?.subtitles) {
+        console.log("📝 Subtítulos disponibles:", video.subtitles);
+      }
+    }
+  }, [details, movieId, video]);
 
   /**
    * Fetches movie details and associated video on mount
@@ -235,8 +249,24 @@ const MovieModal: React.FC<MovieModalProps> = ({
                     poster={video.image}
                     className="movie-modal__video"
                     aria-label={`Video de ${details.title}`}
+                    crossOrigin="anonymous"
                   >
                     <source src={videoFile.link} type={videoFile.fileType} />
+                    
+                    {/* ✅ SUBTÍTULOS - Se cargan automáticamente si existen */}
+                    {video.subtitles && Array.isArray(video.subtitles) && video.subtitles.length > 0 && (
+                      video.subtitles.map((sub: any) => (
+                        <track
+                          key={sub.id}
+                          kind="subtitles"
+                          src={sub.link}
+                          srcLang={sub.lang}
+                          label={sub.lang === 'es' ? 'Español' : sub.lang === 'en' ? 'English' : sub.lang.toUpperCase()}
+                          default={sub.lang === 'es'}
+                        />
+                      ))
+                    )}
+                    
                     Tu navegador no soporta la reproducción de video.
                   </video>
                 </div>

@@ -389,3 +389,99 @@ export interface Genre {
   name: string;
   tmdbId: string;
 }
+
+/**
+ * Pexels Video Data
+ * 
+ * Video information from Pexels API including multiple quality options and subtitles.
+ * Used for movie trailers, clips, or background videos.
+ * 
+ * @interface PexelsVideo
+ * @property {number} id - Unique Pexels video identifier
+ * @property {number} width - Original video width in pixels
+ * @property {number} height - Original video height in pixels
+ * @property {number} duration - Video duration in seconds
+ * @property {string} image - URL to video preview/thumbnail image
+ * @property {string} url - Pexels page URL for the video
+ * @property {Array<VideoFile>} videoFiles - Array of video files in different qualities and formats
+ * @property {Array<VideoSubtitle>} [subtitles] - Optional array of subtitle tracks (VTT format)
+ * 
+ * @typedef {Object} VideoFile
+ * @property {number} id - Unique video file identifier
+ * @property {string} quality - Quality label (e.g., "hd", "sd", "4k")
+ * @property {string} fileType - MIME type (e.g., "video/mp4")
+ * @property {number} width - Video width in pixels for this quality
+ * @property {number} height - Video height in pixels for this quality
+ * @property {string} link - Direct download/stream URL for this video file
+ * 
+ * @typedef {Object} VideoSubtitle
+ * @property {string} id - Unique subtitle track identifier
+ * @property {string} lang - ISO 639-1 language code (e.g., "es", "en")
+ * @property {string} file_type - Subtitle format (e.g., "vtt", "srt")
+ * @property {string} link - Direct URL to subtitle file
+ * 
+ * @example
+ * const video: PexelsVideo = {
+ *   id: 123456,
+ *   width: 1920,
+ *   height: 1080,
+ *   duration: 45,
+ *   image: "https://images.pexels.com/videos/123456/preview.jpg",
+ *   url: "https://www.pexels.com/video/123456",
+ *   videoFiles: [
+ *     {
+ *       id: 1,
+ *       quality: "hd",
+ *       fileType: "video/mp4",
+ *       width: 1920,
+ *       height: 1080,
+ *       link: "https://player.vimeo.com/external/..."
+ *     }
+ *   ],
+ *   subtitles: [
+ *     {
+ *       id: "1",
+ *       lang: "es",
+ *       file_type: "vtt",
+ *       link: "https://example.com/subtitles/es.vtt"
+ *     },
+ *     {
+ *       id: "2",
+ *       lang: "en",
+ *       file_type: "vtt",
+ *       link: "https://example.com/subtitles/en.vtt"
+ *     }
+ *   ]
+ * };
+ * 
+ * @accessibility
+ * - Video players must include captions/subtitles when available
+ * - Subtitles should be enabled by default for accessibility
+ * - Duration should be announced to screen readers before playback
+ * - Provide controls for play/pause, volume, and fullscreen with keyboard support
+ * - Include descriptive labels for quality options
+ * - Ensure video thumbnail has descriptive alt text
+ * - Consider autoplay policies and user preferences
+ */
+export interface PexelsVideo {
+  id: number;
+  width: number;
+  height: number;
+  duration: number;
+  image: string;
+  url: string;
+  videoFiles: Array<{
+    id: number;
+    quality: string;
+    fileType: string;
+    width: number;
+    height: number;
+    link: string;
+  }>;
+  subtitles?: Array<{
+    id: string;
+    lang: string;
+    file_type: string;
+    link: string;
+  }>;
+}
