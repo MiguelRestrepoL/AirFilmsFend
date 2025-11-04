@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { servicioRatings } from "../../services/ratings.servicio";
+import { servicioComentarios, type MovieComment } from "../../services/comments.servicio";
 import type { MovieRatingStats } from "../../types/movies.types";
 import "./rating-modal.scss";
 
@@ -11,16 +12,17 @@ interface RatingModalProps {
 }
 
 /**
- * Rating Modal Component
+ * Rating Modal Component with Comments
  * 
- * Interactive modal for rating movies with 1-5 stars.
- * Shows rating distribution and allows users to submit/update/delete ratings.
+ * Interactive modal for rating movies and viewing/posting comments.
+ * Shows rating distribution, comments section with pagination.
  * 
  * Features:
  * - Interactive 5-star rating system
  * - Real-time rating statistics
  * - Distribution visualization (bar chart)
- * - Update/delete existing ratings
+ * - Comments section with CRUD operations
+ * - Pagination for comments
  * - Full WCAG 2.1 AA compliance
  * 
  * @component
@@ -34,18 +36,33 @@ const RatingModal: React.FC<RatingModalProps> = ({
   onRatingChange,
 }) => {
   const [stats, setStats] = useState<MovieRatingStats | null>(null);
+  const [comments, setComments] = useState<MovieComment[]>([]);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const COMMENTS_PER_PAGE = 5;
+
   /**
-   * Fetches rating statistics on mount
+   * Fetches rating statistics and comments on mount
    */
   useEffect(() => {
     loadStats();
+    loadComments();
   }, [movieId]);
+
+  /**
+   * Reloads comments when page changes
+   */
+  useEffect(() => {
+    loadComments();
+  }, [currentPage]);
 
   /**
    * Handles ESC key press and body scroll lock
@@ -82,6 +99,26 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
+   * Loads comments from backend with pagination
+   */
+  const loadComments = async () => {
+    try {
+      setIsLoadingComments(true);
+      const data = await servicioComentarios.obtenerComentarios(
+        movieId,
+        currentPage,
+        COMMENTS_PER_PAGE
+      );
+      setComments(data.data);
+      setCommentsCount(data.count);
+    } catch (err: any) {
+      console.error("Error al cargar comentarios:", err);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  /**
    * Submits user rating to backend
    */
   const handleSubmit = async () => {
@@ -95,14 +132,12 @@ const RatingModal: React.FC<RatingModalProps> = ({
       setError(null);
       await servicioRatings.calificar(movieId, selectedRating);
       
-      // Reload stats to show updated data
       await loadStats();
       
       if (onRatingChange) {
         onRatingChange();
       }
 
-      // Close modal after short delay
       setTimeout(() => {
         onClose();
       }, 500);
@@ -127,7 +162,6 @@ const RatingModal: React.FC<RatingModalProps> = ({
       setError(null);
       await servicioRatings.eliminarCalificacion(movieId);
       
-      // Reload stats and reset selection
       await loadStats();
       setSelectedRating(0);
       
@@ -135,13 +169,60 @@ const RatingModal: React.FC<RatingModalProps> = ({
         onRatingChange();
       }
 
-      // Close modal after short delay
       setTimeout(() => {
         onClose();
       }, 500);
     } catch (err: any) {
       console.error("Error al eliminar calificación:", err);
       setError(err.message || "Error al eliminar calificación");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Submits new comment
+   */
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newComment.trim()) {
+      alert("Por favor escribe un comentario");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      await servicioComentarios.crearComentario(movieId, newComment);
+      
+      setNewComment("");
+      setCurrentPage(1);
+      await loadComments();
+    } catch (err: any) {
+      console.error("Error al crear comentario:", err);
+      setError(err.message || "Error al crear comentario");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Deletes a comment
+   */
+  const handleCommentDelete = async (commentId: string) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      await servicioComentarios.eliminarComentario(commentId, movieId);
+      await loadComments();
+    } catch (err: any) {
+      console.error("Error al eliminar comentario:", err);
+      setError(err.message || "Error al eliminar comentario");
     } finally {
       setIsSaving(false);
     }
@@ -156,6 +237,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   const averageRating = stats ? servicioRatings.calcularPromedio(stats) : 0;
+  const totalPages = Math.ceil(commentsCount / COMMENTS_PER_PAGE);
 
   return (
     <div
@@ -262,6 +344,100 @@ const RatingModal: React.FC<RatingModalProps> = ({
                 <p>Sé el primero en calificar esta película</p>
               </div>
             )}
+
+            {/* Comments Section */}
+            <div className="rating-modal__comments-section">
+              <h3 className="rating-modal__comments-title">
+                Comentarios ({commentsCount})
+              </h3>
+
+              {/* Comment Form */}
+              <form onSubmit={handleCommentSubmit} className="rating-modal__comment-form">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Escribe tu comentario sobre esta película..."
+                  className="rating-modal__comment-textarea"
+                  rows={3}
+                  maxLength={500}
+                  disabled={isSaving}
+                  aria-label="Escribe tu comentario"
+                />
+                <div className="rating-modal__comment-form-footer">
+                  <span className="rating-modal__char-count">
+                    {newComment.length}/500
+                  </span>
+                  <button
+                    type="submit"
+                    className="rating-modal__btn rating-modal__btn--comment"
+                    disabled={isSaving || !newComment.trim()}
+                  >
+                    {isSaving ? "Publicando..." : "Publicar Comentario"}
+                  </button>
+                </div>
+              </form>
+
+              {/* Comments List */}
+              <div className="rating-modal__comments-list">
+                {isLoadingComments ? (
+                  <div className="rating-modal__loading-comments">
+                    <div className="rating-modal__spinner" aria-hidden="true"></div>
+                    <p>Cargando comentarios...</p>
+                  </div>
+                ) : comments.length === 0 ? (
+                  <p className="rating-modal__no-comments">
+                    No hay comentarios aún. ¡Sé el primero en comentar!
+                  </p>
+                ) : (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="rating-modal__comment">
+                      <div className="rating-modal__comment-header">
+                        <span className="rating-modal__comment-author">
+                          {comment.users[0]?.name} {comment.users[0]?.lastName}
+                        </span>
+                        <span className="rating-modal__comment-date">
+                          {servicioComentarios.formatearTiempoRelativo(comment.createdAt)}
+                        </span>
+                      </div>
+                      <p className="rating-modal__comment-text">{comment.comment}</p>
+                      <button
+                        onClick={() => handleCommentDelete(comment.id)}
+                        className="rating-modal__comment-delete"
+                        aria-label="Eliminar comentario"
+                        disabled={isSaving}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="rating-modal__pagination">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1 || isLoadingComments}
+                    className="rating-modal__pagination-btn"
+                    aria-label="Página anterior"
+                  >
+                    ← Anterior
+                  </button>
+                  <span className="rating-modal__pagination-info">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages || isLoadingComments}
+                    className="rating-modal__pagination-btn"
+                    aria-label="Página siguiente"
+                  >
+                    Siguiente →
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Rating Selector */}
             <div className="rating-modal__selector">
