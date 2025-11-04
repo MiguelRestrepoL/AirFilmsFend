@@ -240,30 +240,33 @@ const RatingModal: React.FC<RatingModalProps> = ({
   /**
    * Deletes a comment (only if user is the owner)
    */
-  const handleCommentDelete = async (commentId: string) => {
-    console.log("🔍 Intentando eliminar comentario:", {
-      commentId,
-      movieId,
-      type: typeof commentId,
-      length: commentId?.length
-    });
+const handleCommentDelete = async (commentId: string | number) => {
+  // ✅ Convertir a string sin importar el tipo
+  const commentIdStr = String(commentId);
+  
+  console.log("🔍 Intentando eliminar comentario:", {
+    commentId: commentIdStr,
+    movieId,
+    type: typeof commentIdStr,
+    length: commentIdStr.length
+  });
 
-    if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
-      return;
-    }
+  if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
+    return;
+  }
 
-    try {
-      setIsSaving(true);
-      setError(null);
-      await servicioComentarios.eliminarComentario(commentId, movieId);
-      await loadComments();
-    } catch (err: any) {
-      console.error("Error al eliminar comentario:", err);
-      setError(err.message || "Error al eliminar comentario");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  try {
+    setIsSaving(true);
+    setError(null);
+    await servicioComentarios.eliminarComentario(commentIdStr, movieId);
+    await loadComments();
+  } catch (err: any) {
+    console.error("Error al eliminar comentario:", err);
+    setError(err.message || "Error al eliminar comentario");
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   /**
    * Calculates percentage for rating distribution bar

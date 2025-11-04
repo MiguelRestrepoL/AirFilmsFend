@@ -202,34 +202,37 @@ class CommentsService {
    * - Announce success/failure to screen readers
    * - Provide confirmation dialog before deletion
    */
-  async eliminarComentario(commentId: string, movieId: number): Promise<void> {
-    const token = this.getAuthToken();
+async eliminarComentario(commentId: string | number, movieId: number): Promise<void> {
+  const token = this.getAuthToken();
 
-    if (!token) {
-      throw new Error("Debes iniciar sesión para eliminar comentarios");
-    }
+  if (!token) {
+    throw new Error("Debes iniciar sesión para eliminar comentarios");
+  }
 
-    // Validate commentId format
-    if (!commentId || typeof commentId !== 'string' || commentId.trim().length === 0) {
-      throw new Error("ID de comentario inválido");
-    }
+  // ✅ Convertir a string
+  const commentIdStr = String(commentId);
 
-    // Validate movieId
-    if (!movieId || !Number.isFinite(movieId) || movieId < 1) {
-      throw new Error("ID de película inválido");
-    }
+  // Validate commentId format
+  if (!commentIdStr || commentIdStr.trim().length === 0) {
+    throw new Error("ID de comentario inválido");
+  }
 
-    console.log("🗑️ Eliminando comentario:", { commentId, movieId, type: typeof commentId });
+  // Validate movieId
+  if (!movieId || !Number.isFinite(movieId) || movieId < 1) {
+    throw new Error("ID de película inválido");
+  }
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/movies/delete-comment`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id: commentId, movieId }),
-      });
+  console.log("🗑️ Eliminando comentario:", { commentId: commentIdStr, movieId, type: typeof commentIdStr });
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/movies/delete-comment`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id: commentIdStr, movieId }),
+    });
 
       if (!response.ok) {
         const errorData = await response.json();
