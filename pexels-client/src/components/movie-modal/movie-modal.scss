@@ -322,6 +322,51 @@
     margin-bottom: 1rem;
   }
 
+  // ⭐ NUEVO: Botón clickeable de rating
+  &__rating-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 193, 7, 0.15);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    min-height: 36px;
+    color: #ffc107;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #64b5f6;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.2);
+    }
+
+    &:hover {
+      background: rgba(255, 193, 7, 0.25);
+      border-color: #ffc107;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    // Emoji estrella más grande
+    span:first-child {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+  }
+
   &__divider {
     color: #666;
   }
@@ -405,13 +450,20 @@
       width: 44px;
       height: 44px;
     }
+
+    &__rating-btn {
+      font-size: 0.95rem;
+      padding: 0.3rem 0.75rem;
+      min-height: 32px;
+    }
   }
 
   // ✅ WCAG: High contrast mode support
   @media (prefers-contrast: high) {
     &__close,
     &__favorite,
-    &__error-btn {
+    &__error-btn,
+    &__rating-btn {
       border-width: 3px;
     }
 
@@ -426,6 +478,7 @@
     &__content,
     &__close,
     &__favorite,
+    &__rating-btn,
     &__error-btn,
     &__spinner,
     * {
