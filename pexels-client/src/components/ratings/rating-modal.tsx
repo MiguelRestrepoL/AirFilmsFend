@@ -4,6 +4,14 @@ import { servicioComentarios, type MovieComment } from "../../services/comments.
 import type { MovieRatingStats } from "../../types/movies.types";
 import "./rating-modal.scss";
 
+/**
+ * Props for the RatingModal component
+ * @interface RatingModalProps
+ * @property {number} movieId - Unique identifier for the movie
+ * @property {string} movieTitle - Title of the movie to display
+ * @property {Function} onClose - Callback function to close the modal
+ * @property {Function} [onRatingChange] - Optional callback triggered when rating changes
+ */
 interface RatingModalProps {
   movieId: number;
   movieTitle: string;
@@ -28,6 +36,16 @@ interface RatingModalProps {
  * @component
  * @param {RatingModalProps} props - Component props
  * @returns {JSX.Element} Rating modal overlay
+ * 
+ * @example
+ * ```tsx
+ * <RatingModal
+ *   movieId={123}
+ *   movieTitle="The Matrix"
+ *   onClose={() => setShowModal(false)}
+ *   onRatingChange={() => refreshMovieData()}
+ * />
+ * ```
  */
 const RatingModal: React.FC<RatingModalProps> = ({
   movieId,
@@ -35,23 +53,37 @@ const RatingModal: React.FC<RatingModalProps> = ({
   onClose,
   onRatingChange,
 }) => {
+  // Statistics and comments state
   const [stats, setStats] = useState<MovieRatingStats | null>(null);
   const [comments, setComments] = useState<MovieComment[]>([]);
   const [commentsCount, setCommentsCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Rating interaction state
   const [selectedRating, setSelectedRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  
+  // Comment form state
   const [newComment, setNewComment] = useState("");
+  
+  // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // User state
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  /** Number of comments to display per page */
   const COMMENTS_PER_PAGE = 5;
 
   /**
-   * Fetches rating statistics, comments, and current user ID on mount
+   * Fetches rating statistics, comments, and current user ID on component mount
+   * Runs once when the component is first rendered
+   * 
+   * @effect
+   * @dependencies [movieId]
    */
   useEffect(() => {
     loadStats();
@@ -60,16 +92,29 @@ const RatingModal: React.FC<RatingModalProps> = ({
   }, [movieId]);
 
   /**
-   * Reloads comments when page changes
+   * Reloads comments when the current page changes
+   * Ensures the correct page of comments is displayed
+   * 
+   * @effect
+   * @dependencies [currentPage]
    */
   useEffect(() => {
     loadComments();
   }, [currentPage]);
 
   /**
-   * Handles ESC key press and body scroll lock
+   * Handles ESC key press to close modal and manages body scroll lock
+   * Prevents background scrolling when modal is open
+   * Cleans up event listeners and restores scroll on unmount
+   * 
+   * @effect
+   * @dependencies [onClose]
    */
   useEffect(() => {
+    /**
+     * Handles keyboard events for modal accessibility
+     * @param {KeyboardEvent} e - Keyboard event object
+     */
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -84,7 +129,12 @@ const RatingModal: React.FC<RatingModalProps> = ({
   }, [onClose]);
 
   /**
-   * Loads current user ID from JWT token
+   * Loads current user ID from JWT authentication token
+   * Decodes the JWT payload to extract user identification
+   * Handles missing or invalid tokens gracefully
+   * 
+   * @function
+   * @returns {void}
    */
   const loadCurrentUserId = () => {
     try {
@@ -94,7 +144,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
         return;
       }
 
-      // Decodificar el JWT (el payload está en la segunda parte)
+      // Decode JWT (payload is in the second part)
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userId = payload.userId || payload.sub || payload.id;
       
@@ -106,7 +156,14 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Loads rating statistics from backend
+   * Loads rating statistics from the backend API
+   * Fetches aggregate rating data including distribution and averages
+   * Updates component state with loading and error handling
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   * @throws {Error} When the API request fails
    */
   const loadStats = async () => {
     try {
@@ -123,7 +180,14 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Loads comments from backend with pagination
+   * Loads comments from the backend API with pagination
+   * Fetches a paginated list of user comments for the movie
+   * Updates comments list and total count
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   * @throws {Error} When the API request fails
    */
   const loadComments = async () => {
     try {
@@ -149,7 +213,14 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Submits user rating to backend
+   * Submits user rating to the backend API
+   * Validates that a rating has been selected before submitting
+   * Reloads statistics and closes modal on success
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   * @throws {Error} When the rating submission fails
    */
   const handleSubmit = async () => {
     if (selectedRating === 0) {
@@ -180,7 +251,14 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Deletes user's rating
+   * Deletes the user's existing rating
+   * Prompts for confirmation before deletion
+   * Reloads statistics and resets rating selection on success
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   * @throws {Error} When the rating deletion fails
    */
   const handleDelete = async () => {
     if (!confirm("¿Estás seguro de que quieres eliminar tu calificación?")) {
@@ -211,7 +289,15 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Submits new comment
+   * Submits a new comment to the backend API
+   * Validates that comment text is not empty before submission
+   * Resets form and reloads comments on success
+   * 
+   * @async
+   * @function
+   * @param {React.FormEvent} e - Form submission event
+   * @returns {Promise<void>}
+   * @throws {Error} When the comment submission fails
    */
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,45 +324,66 @@ const RatingModal: React.FC<RatingModalProps> = ({
   };
 
   /**
-   * Deletes a comment (only if user is the owner)
+   * Deletes a specific comment from the backend
+   * Only allows deletion if the current user is the comment owner
+   * Prompts for confirmation before deletion
+   * 
+   * @async
+   * @function
+   * @param {string | number} commentId - Unique identifier of the comment to delete
+   * @returns {Promise<void>}
+   * @throws {Error} When the comment deletion fails
    */
-const handleCommentDelete = async (commentId: string | number) => {
-  // ✅ Convertir a string sin importar el tipo
-  const commentIdStr = String(commentId);
-  
-  console.log("🔍 Intentando eliminar comentario:", {
-    commentId: commentIdStr,
-    movieId,
-    type: typeof commentIdStr,
-    length: commentIdStr.length
-  });
+  const handleCommentDelete = async (commentId: string | number) => {
+    // Convert to string regardless of type
+    const commentIdStr = String(commentId);
+    
+    console.log("🔍 Intentando eliminar comentario:", {
+      commentId: commentIdStr,
+      movieId,
+      type: typeof commentIdStr,
+      length: commentIdStr.length
+    });
 
-  if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
-    return;
-  }
+    if (!confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
+      return;
+    }
 
-  try {
-    setIsSaving(true);
-    setError(null);
-    await servicioComentarios.eliminarComentario(commentIdStr, movieId);
-    await loadComments();
-  } catch (err: any) {
-    console.error("Error al eliminar comentario:", err);
-    setError(err.message || "Error al eliminar comentario");
-  } finally {
-    setIsSaving(false);
-  }
-};
+    try {
+      setIsSaving(true);
+      setError(null);
+      await servicioComentarios.eliminarComentario(commentIdStr, movieId);
+      await loadComments();
+    } catch (err: any) {
+      console.error("Error al eliminar comentario:", err);
+      setError(err.message || "Error al eliminar comentario");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   /**
-   * Calculates percentage for rating distribution bar
+   * Calculates percentage for rating distribution bar chart
+   * Returns 0 if no ratings exist to prevent division by zero
+   * 
+   * @function
+   * @param {number} count - Number of ratings for a specific star value
+   * @returns {number} Percentage rounded to nearest integer (0-100)
+   * 
+   * @example
+   * ```typescript
+   * getPercentage(15) // Returns 30 if totalCount is 50
+   * ```
    */
   const getPercentage = (count: number): number => {
     if (!stats || stats.totalCount === 0) return 0;
     return Math.round((count / stats.totalCount) * 100);
   };
 
+  /** Calculated average rating from statistics */
   const averageRating = stats ? servicioRatings.calcularPromedio(stats) : 0;
+  
+  /** Total number of pages for comment pagination */
   const totalPages = Math.ceil(commentsCount / COMMENTS_PER_PAGE);
 
   return (
@@ -441,7 +548,7 @@ const handleCommentDelete = async (commentId: string | number) => {
                       </div>
                       <p className="rating-modal__comment-text">{comment.comment}</p>
                       
-                      {/* ✅ SOLO muestra el botón si el usuario actual es el dueño del comentario */}
+                      {/* Only show delete button if current user owns the comment */}
                       {currentUserId && currentUserId === comment.userId && (
                         <button
                           onClick={() => handleCommentDelete(comment.id)}
